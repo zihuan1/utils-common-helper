@@ -116,3 +116,22 @@ fun stringFilter(str: String): String {
     return m.replaceAll("").trim { it <= ' ' }
 }
 
+/**
+ * map转为字符串
+ *
+ * @param map
+ * @return
+ */
+fun transMap2String(map: Map<*, *>): String {
+    var entry: java.util.Map.Entry<*, *>
+    val sb = StringBuffer()
+    val iterator = map.entries.iterator()
+    while (iterator.hasNext()) {
+        entry = iterator.next() as java.util.Map.Entry<*, *>
+        sb.append(entry.key.toString()).append("=").append(if (null == entry.value)
+            ""
+        else
+            entry.value.toString()).append(if (iterator.hasNext()) "&" else "")
+    }
+    return sb.toString()
+}
