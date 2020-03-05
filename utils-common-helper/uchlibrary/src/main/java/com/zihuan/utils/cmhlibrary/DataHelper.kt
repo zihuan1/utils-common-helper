@@ -1,5 +1,7 @@
 package com.zihuan.utils.cmhlibrary
 
+import java.util.regex.Pattern
+
 
 /**
  * 当前类包含了常用的基本数据类型操作
@@ -96,3 +98,21 @@ fun IntNotZero(vararg args: Int): Int {
  * 判断当前字符是否为空,如果为空返回0,否则返回自身
  */
 fun String.getNotEmptyNumber() = if (isNullOrEmpty() || isBlank()) "0" else this
+
+
+/**
+ * 去除特殊字符或将所有中文标号替换为英文标号
+ *
+ * @param str
+ * @return
+ */
+fun stringFilter(str: String): String {
+    var str = str
+    str = str.replace("【".toRegex(), "[").replace("】".toRegex(), "]")
+            .replace("！".toRegex(), "!").replace("：".toRegex(), ":")// 替换中文标号
+    val regEx = "[『』]" // 清除掉特殊字符
+    val p = Pattern.compile(regEx)
+    val m = p.matcher(str)
+    return m.replaceAll("").trim { it <= ' ' }
+}
+
