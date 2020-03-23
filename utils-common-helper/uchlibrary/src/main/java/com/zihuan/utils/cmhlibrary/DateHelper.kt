@@ -13,6 +13,9 @@ import java.util.Date
  * 日期转换工具类
  */
 
+
+const val TIME_YYYY_MM_dd_HH_mm_ss="yyyy-MM-dd HH:mm:ss"
+const val TIME_YYYY_MM_dd="yyyy-MM-dd"
 /**
  * 时间转换为时间戳
  */
@@ -20,7 +23,7 @@ fun dateToStamp(time: String, type: String): String {
     var time = time
     var type = type
     if (TextUtils.isEmpty(type)) {
-        type = "yyyy-MM-dd HH:mm:ss"
+        type = TIME_YYYY_MM_dd_HH_mm_ss
     }
     val simpleDateFormat = SimpleDateFormat(type)
     try {
@@ -39,7 +42,7 @@ fun dateToStamp(time: String, type: String): String {
 fun stampToDate(time: String, type: String): String {
     var type = type
     if (TextUtils.isEmpty(type)) {
-        type = "yyyy-MM-dd"
+        type = TIME_YYYY_MM_dd
     }
     if (TextUtils.isEmpty(time)) {
         return ""
@@ -134,7 +137,7 @@ fun stampFormDateYY_MM_dd_HH_mm_ss(argTime: Long): String {
 fun getSysTimeType(type: String): String {
     var type = type
     if (TextUtils.isEmpty(type)) {
-        type = "yyyyMMddHHmmss"
+        type = TIME_YYYY_MM_dd_HH_mm_ss
     }
     val formatter = SimpleDateFormat(type)
     val curDate = Date(System.currentTimeMillis())//获取当前时间
@@ -232,7 +235,7 @@ fun getTopWeek(c: Int): List<*> {
  */
 fun getApartDay(a: String, b: String): Int {
 
-    val sdf = SimpleDateFormat("yyyy-MM-dd")
+    val sdf = SimpleDateFormat(TIME_YYYY_MM_dd)
     val day1 = sdf.format(Date(java.lang.Long.parseLong(a) * 1000))
     val day2 = sdf.format(Date(java.lang.Long.parseLong(b) * 1000))
     var d1: Date? = null
@@ -266,7 +269,7 @@ fun getApartDay(a: String, b: String): Int {
  * 两个时间戳相差多少时分秒
  */
 fun timeStampDiffHMS(time1: String, time2: String): String {
-    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val df = SimpleDateFormat(TIME_YYYY_MM_dd_HH_mm_ss)
     try {
         val d1 = df.parse(time1)//当前时间
 
@@ -301,7 +304,7 @@ fun timeStampDiffHMS(time1: String, time2: String): String {
  * 计算两个时间戳相差多少秒
  */
 fun timeStampDiffSecond(time1: String, time2: String): String {
-    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val df = SimpleDateFormat(TIME_YYYY_MM_dd_HH_mm_ss)
     try {
         val d1 = df.parse(time1)//当前时间
 
@@ -329,8 +332,8 @@ fun timeStampDiffSecond(time1: String, time2: String): String {
  * @return
  */
 fun GetToday(): Long {
-    val strToday = getSysTimeType("yyyy年MM月dd日")
-    val today = dateToStamp("$strToday 00:00:00", "yyyy-MM-dd HH:mm:ss").toLong()
+    val strToday = getSysTimeType(TIME_YYYY_MM_dd)
+    val today = dateToStamp("$strToday 00:00:00", TIME_YYYY_MM_dd_HH_mm_ss).toLong()
     return today / 1000
 }
 
