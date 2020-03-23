@@ -62,10 +62,42 @@ inline fun <T> Boolean.threeUnary(any: T, any2: T): T {
     } else any2
 }
 
+inline fun <T> threeUnary(any: T, any2: T, action: () -> Boolean): T {
+    return if (action()) {
+        any
+    } else any2
+}
+
 /**
  * 当前数是否大于九
  */
 fun Int.lessThanNine() = this <= 9
+
+fun Long.lessThanNine() = this <= 9
+
+fun Int.isEmpty() = this <= 0
+fun Int.isNotEmpty() = this > 0
+
+fun Long.isEmpty() = this <= 0
+fun Long.isNotEmpty() = this > 0
+
+
+//private fun <T : Number> T.compare(i: Number): Number {
+//    return when (i) {
+//        is Int -> i
+//        else -> i as Long
+//    }
+//}
+
+/**
+ * 返回第一个非零的数字
+ */
+fun IntNotZero(vararg args: Int): Int {
+    args.forEach {
+        if (it > 0) return it
+    }
+    return 0
+}
 
 /**
  * 如果小于九在前面添0
@@ -81,16 +113,6 @@ fun StringDetermineEmpty(vararg args: String): String {
         if (!it.isNullOrBlank()) return it
     }
     return ""
-}
-
-/**
- * 返回第一个非零的数字
- */
-fun IntNotZero(vararg args: Int): Int {
-    args.forEach {
-        if (it > 0) return it
-    }
-    return 0
 }
 
 
