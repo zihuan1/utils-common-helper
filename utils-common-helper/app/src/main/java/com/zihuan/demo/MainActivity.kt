@@ -1,12 +1,13 @@
 package com.zihuan.demo
 
+import android.Manifest
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.zihuan.utils.cmhlibrary.CommonHelperCreate
-import com.zihuan.utils.cmhlibrary.PreferenceProxy
-import com.zihuan.utils.cmhlibrary.getCommonPreference
-import com.zihuan.utils.cmhlibrary.savePreference
+import com.zihuan.utils.cmhlibrary.*
+import com.zihuan.utils.cmhlibrary.FileUtils.stringMerge
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.reflect.Field
 import java.util.*
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         CommonHelperCreate.setContext(this)
         var email by PreferenceProxy("email", "")
         tv_1.setOnClickListener {
-            email = tv_3.text.toString()
+            email = et_path.text.toString()
 //            a.isEmptyExtend {
 //                Log.e("输出1", "测试$a")
 //                return@setOnClickListener
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         val select = true
         select.savePreference("select")
         var mobile = getCommonPreference("mobile", 0)
-        Log.e("输出mobile", "getCommonPreference =$mobile")
+//        Log.e("输出mobile", "getCommonPreference =$mobile")
 //        var list = ArrayList<String>()
 //        (0..100).forEach {
 //            list.add("$it")
@@ -69,7 +70,18 @@ class MainActivity : AppCompatActivity() {
 //            it.isAccessible = true
 //            var a = it.get("mList")
 //        }
-
+        et_path.setText(Environment.getExternalStorageDirectory().toString() + "/")
+        shareFile.setOnClickListener {
+            requestMyPermission(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) {
+                var url = stringMerge(et_path.text.toString())
+                Log.e("成功", "合并成功$url")
+                Toast.makeText(this, "成功", Toast.LENGTH_LONG).show()
+//                shareSystem(url)
+            }
+        }
     }
 
     fun getFiledsInfo(className: String): List<Field> {

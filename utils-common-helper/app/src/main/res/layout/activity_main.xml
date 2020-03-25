@@ -23,9 +23,15 @@
 
 
     <EditText
-        android:id="@+id/tv_3"
+        android:id="@+id/et_path"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="请输入合并文件目录" />
+
+    <Button
+        android:id="@+id/shareFile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp" />
-
+        android:text="合并文件并且分享" />
 </LinearLayout>

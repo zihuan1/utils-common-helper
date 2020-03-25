@@ -61,6 +61,8 @@ object FileUtils {
                 } else {
                     files.add(it)
                 }
+                Logger("文件夹" + it.absoluteFile)
+
             }
         }
         return files
@@ -74,13 +76,26 @@ object FileUtils {
      *      FileUtils.getFilesPath(Environment.getExternalStorageDirectory().toString() + "/src/", list)
      *      FileUtils.stringMerge(list)
      * **/
-    fun stringMerge(files: List<File>) {
+    fun stringMerge(path: String): String {
         var outPath =
-            Environment.getExternalStorageDirectory().toString() + "/amergecode/mergecode1.txt"
-        var outOs = FileOutputStream(File(outPath))
+            Environment.getExternalStorageDirectory().toString() + "/amergecode"
+        val file = File(outPath)
+        if (!file.exists()) {
+            file.mkdir()
+            Logger("创建文件夹")
+        }
+        val name = path.split("/").let {
+            it[it.lastIndex]
+        }
+        val file2 = File(file.absolutePath + "/$name${System.currentTimeMillis()}.txt")
+        if (!file2.exists()) {
+            file2.createNewFile()
+            Logger("创建文件")
+        }
+        var outOs = FileOutputStream(file2)
         outOs.use {
             it.channel.use { fileChannel ->
-                files.forEach { it ->
+                getFilesPath(path, ArrayList()).forEach { it ->
                     FileInputStream(it.absoluteFile).channel.use { it ->
                         it.transferTo(
                             0,
@@ -91,6 +106,7 @@ object FileUtils {
                 }
             }
         }
+        return file2.absolutePath
     }
 
     val FILENAME = "tripsTemp"
@@ -671,4 +687,26 @@ private fun renameFile2(oldPath: String, newPath: String) {
 
     val file = File(oldPath)
     file.renameTo(File(newPath))
+}
+
+/** 将多个文件夹的内容合并到一个新文件
+ * 一般用于申请软著之类的需要3000行代码
+ */
+fun stringMerge(files: List<File>) {
+    var outPath =
+        Environment.getExternalStorageDirectory().toString() + "/amergecode/mergecode1.txt"
+    var outOs = FileOutputStream(File(outPath))
+    outOs.use { stream ->
+        stream.channel.use { fileChannel ->
+            files.forEach { file ->
+                FileInputStream(file.absoluteFile).channel.use {
+                    it.transferTo(
+                        0,
+                        it.size(),
+                        fileChannel
+                    )
+                }
+            }
+        }
+    }
 }
