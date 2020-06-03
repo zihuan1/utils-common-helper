@@ -14,8 +14,9 @@ import java.util.Date
  */
 
 
-const val TIME_YYYY_MM_dd_HH_mm_ss="yyyy-MM-dd HH:mm:ss"
-const val TIME_YYYY_MM_dd="yyyy-MM-dd"
+const val TIME_YYYY_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss"
+const val TIME_YYYY_MM_dd = "yyyy-MM-dd"
+
 /**
  * 时间转换为时间戳
  */
@@ -349,7 +350,7 @@ fun GetTomorrow(): Long {
 
 var DateUtilsDebug = false
 
-fun Logger(logger: String) {
+internal fun Logger(logger: String) {
     if (DateUtilsDebug) {
         Log.e("DateUtil", logger)
     }
