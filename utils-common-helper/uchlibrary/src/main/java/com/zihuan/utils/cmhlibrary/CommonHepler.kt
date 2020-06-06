@@ -31,16 +31,16 @@ fun isFastClick(): Boolean {
 /**
  * 显示键盘
  */
-fun showKeyBoard(view: EditText) {
+fun EditText.showKeyBoard() {
     val imm = CommonContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    view.requestFocus()
-    imm.showSoftInput(view, 0)
+    requestFocus()
+    imm.showSoftInput(this, 0)
 }
 
 // 隐藏键盘
-fun hideKeyboard(context: Context, view: View) {
+fun EditText.hideKeyboard() {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    imm.hideSoftInputFromWindow(view.windowToken, 0)
+    imm.hideSoftInputFromWindow(this.windowToken, 0)
 }
 
 /**
@@ -50,22 +50,25 @@ fun hideKeyboard(context: Context, view: View) {
  */
 fun checkNetworkConnected(): Boolean {
     val mConnectivityManager = CommonContext
-            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val mNetworkInfo = mConnectivityManager.activeNetworkInfo
     if (mNetworkInfo != null) {
         return mNetworkInfo.isAvailable
     }
     return false
 }
+
 /**
  * 检测GPS是否打开
  *
  * @return
  */
 fun checkGPSIsOpen(): Boolean {
-    val locationManager = CommonContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    val locationManager =
+        CommonContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 }
+
 /**
  * 状态栏高度
  *
