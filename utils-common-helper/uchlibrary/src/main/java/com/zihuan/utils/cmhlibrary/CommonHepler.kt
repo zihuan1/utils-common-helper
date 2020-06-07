@@ -10,6 +10,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
+import java.text.FieldPosition
 
 
 /**
@@ -31,16 +32,38 @@ fun isFastClick(): Boolean {
 /**
  * 显示键盘
  */
-fun EditText.showKeyBoard() {
+fun EditText.showKeyBoard(): EditText {
+    isFocusable = true
     val imm = CommonContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     requestFocus()
     imm.showSoftInput(this, 0)
+    return this
 }
 
+
 // 隐藏键盘
-fun EditText.hideKeyboard() {
+fun EditText.hideKeyboard(): EditText {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(this.windowToken, 0)
+    return this
+}
+
+/**
+ * 光标移动到最后
+ */
+fun EditText.cursorMoveToEnd(): EditText {
+    if (!text.isNullOrBlank())
+        setSelection(text.length)
+    return this
+}
+
+/**
+ * 广播移动到指定位置
+ */
+fun EditText.cursorMoveToPosition(position: Int): EditText {
+    if (!text.isNullOrBlank() && text.length >= position)
+        setSelection(position)
+    return this
 }
 
 /**
