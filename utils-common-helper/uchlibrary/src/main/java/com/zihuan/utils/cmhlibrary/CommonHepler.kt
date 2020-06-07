@@ -34,6 +34,7 @@ fun isFastClick(): Boolean {
  */
 fun EditText.showKeyBoard(): EditText {
     isFocusable = true
+    isFocusableInTouchMode = true
     val imm = CommonContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     requestFocus()
     imm.showSoftInput(this, 0)
