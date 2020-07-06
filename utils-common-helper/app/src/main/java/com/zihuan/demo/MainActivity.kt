@@ -45,6 +45,10 @@ class MainActivity : AppCompatActivity() {
         mo.savePreference("mobile")
         val select = true
         select.savePreference("select")
+
+        Log.e("转换", "${10.dp}")
+        Log.e("转换", "${10f.dp}")
+
         var mobile = getCommonPreference("mobile", 0)
 //        Log.e("输出mobile", "getCommonPreference =$mobile")
 //        var list = ArrayList<String>()

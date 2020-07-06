@@ -1,5 +1,6 @@
 package com.zihuan.utils.cmhlibrary
 
+import android.content.Context
 import java.util.regex.Pattern
 
 
@@ -82,6 +83,43 @@ fun Long.isEmpty() = this <= 0
 fun Long.isNotEmpty() = this > 0
 
 
+//dp转px
+var Int.px: Int
+    get() = this.toFloat().px.toInt()
+    set(value) {
+    }
+
+var Float.px: Float
+    get() = CommonContext.resources.displayMetrics.density * this
+    set(value) {
+    }
+
+//sp转px
+var Int.spx: Int
+    get() = this.toFloat().spx.toInt()
+    set(value) {}
+var Float.spx: Float
+    get() = (CommonContext.resources.displayMetrics.scaledDensity * this)
+    set(value) {}
+
+// px转dp
+var Int.dp: Int
+    get() = this.toFloat().dp.toInt()
+    set(value) {}
+
+var Float.dp: Float
+    get() = this / CommonContext.resources.displayMetrics.density
+    set(value) {}
+
+//px转sp
+var Int.sp: Int
+    get() = this.toFloat().sp.toInt()
+    set(value) {}
+
+var Float.sp: Float
+    get() = this / CommonContext.resources.displayMetrics.scaledDensity
+    set(value) {}
+
 //private fun <T : Number> T.compare(i: Number): Number {
 //    return when (i) {
 //        is Int -> i
@@ -131,7 +169,7 @@ fun String.getNotEmptyNumber() = if (isNullOrEmpty() || isBlank()) "0" else this
 fun stringFilter(str: String): String {
     var str = str
     str = str.replace("【".toRegex(), "[").replace("】".toRegex(), "]")
-            .replace("！".toRegex(), "!").replace("：".toRegex(), ":")// 替换中文标号
+        .replace("！".toRegex(), "!").replace("：".toRegex(), ":")// 替换中文标号
     val regEx = "[『』]" // 清除掉特殊字符
     val p = Pattern.compile(regEx)
     val m = p.matcher(str)
@@ -150,10 +188,12 @@ fun transMap2String(map: Map<*, *>): String {
     val iterator = map.entries.iterator()
     while (iterator.hasNext()) {
         entry = iterator.next() as java.util.Map.Entry<*, *>
-        sb.append(entry.key.toString()).append("=").append(if (null == entry.value)
-            ""
-        else
-            entry.value.toString()).append(if (iterator.hasNext()) "&" else "")
+        sb.append(entry.key.toString()).append("=").append(
+            if (null == entry.value)
+                ""
+            else
+                entry.value.toString()
+        ).append(if (iterator.hasNext()) "&" else "")
     }
     return sb.toString()
 }
