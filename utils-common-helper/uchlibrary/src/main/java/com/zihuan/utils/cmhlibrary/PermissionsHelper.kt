@@ -15,26 +15,23 @@ import com.github.dfqin.grantor.PermissionsUtil
  */
 
 
-inline fun Activity.requestMyPermission(vararg permissions: String, crossinline permissionListener: () -> Unit) {
-    requestEasyPermission(*permissions, permissionListener = permissionListener)
-}
-
-inline fun Fragment.requestMyPermission(vararg permissions: String, crossinline permissionListener: () -> Unit) {
+inline fun Fragment.requestEasyPermission(vararg permissions: String, crossinline permissionListener: (pass: Boolean) -> Unit) {
     requireContext().requestEasyPermission(*permissions, permissionListener = permissionListener)
 }
 
-inline fun View.requestMyPermission(vararg permissions: String, crossinline permissionListener: () -> Unit) {
+inline fun View.requestEasyPermission(vararg permissions: String, crossinline permissionListener: (pass: Boolean) -> Unit) {
     context.requestEasyPermission(*permissions, permissionListener = permissionListener)
 }
 
-inline fun Context.requestEasyPermission(vararg permissions: String, crossinline permissionListener: () -> Unit) {
+inline fun Context.requestEasyPermission(vararg permissions: String, crossinline permissionListener: (pass: Boolean) -> Unit) {
     var permission = object : PermissionListener {
         override fun permissionGranted(permission: Array<out String>) {
 //            toast("授权通过")
-            permissionListener()
+            permissionListener(true)
         }
 
         override fun permissionDenied(permission: Array<out String>) {
+            permissionListener(false)
         }
 
     }

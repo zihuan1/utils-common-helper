@@ -17,15 +17,14 @@ import kotlin.math.min
 /**
  * 保存图片到SD卡
  *
- * @param bitmap      保存的图片
- * @param argFileName
+ * @param fileName
  * @param quality     保存的质量（1-100）
  * @param fScale      压缩比率 1为原图
  */
-fun saveBitmapToSD(bitmap: Bitmap, path: String, argFileName: String, quality: Int, fScale: Float = 1f): String {
-    val pFileDir = File(Environment.getExternalStorageDirectory(), path)
+fun Bitmap.saveBitmapToSD(path: String, fileName: String, quality: Int, fScale: Float = 1f): String {
+    val pFileDir = File(path)
     var url = ""
-    val pFilePath = File(pFileDir, argFileName)
+    val pFilePath = File(pFileDir, fileName)
     if (!pFileDir.exists()) {
         pFileDir.mkdirs()//如果路径不存在就先创建路径
     }
@@ -33,11 +32,11 @@ fun saveBitmapToSD(bitmap: Bitmap, path: String, argFileName: String, quality: I
         val out = FileOutputStream(pFilePath)
         val stream = BufferedOutputStream(out)
         var newBitmap = if (fScale == 1f) {
-            Bitmap.createBitmap(bitmap)
+            Bitmap.createBitmap(this)
         } else {
-            compressImage(bitmap, fScale)
+            compressImage(this, fScale)
         }
-        newBitmap!!.compress(Bitmap.CompressFormat.JPEG, quality, stream)
+        newBitmap!!.compress(Bitmap.CompressFormat.PNG, quality, stream)
         url = pFilePath.absolutePath
         out.close()
         stream.flush()//输出
@@ -51,7 +50,7 @@ fun saveBitmapToSD(bitmap: Bitmap, path: String, argFileName: String, quality: I
             return url
         } else {
             //                修复旋转重新保存
-            saveBitmapToSD(rotatingImageView(arg, bitmap), path, argFileName, quality, fScale)
+            rotatingImageView(arg, this).saveBitmapToSD(path, fileName, quality, fScale)
         }
     } catch (e: Exception) {
         Logger("保存失败$e")
@@ -278,8 +277,10 @@ private fun transform(scaler: Matrix?, source: Bitmap, targetWidth: Int, targetH
 fun BoxBlurFilter(bmp: Bitmap): Bitmap {
     /** 水平方向模糊度  */
     val hRadius = 10f
+
     /** 竖直方向模糊度  */
     val vRadius = 10f
+
     /** 模糊迭代度  */
     val iterations = 7
     val width = bmp.width

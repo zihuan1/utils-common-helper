@@ -76,9 +76,9 @@ class MainActivity : AppCompatActivity() {
 //        }
         et_path.setText(Environment.getExternalStorageDirectory().toString() + "/")
         shareFile.setOnClickListener {
-            requestMyPermission(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            requestEasyPermission(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) {
                 var url = stringMerge(et_path.text.toString())
                 Log.e("成功", "合并成功$url")
