@@ -1,11 +1,14 @@
 package com.zihuan.demo
 
 import android.Manifest
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import com.zihuan.utils.cmhlibrary.*
 import com.zihuan.utils.cmhlibrary.FileUtils.stringMerge
 import kotlinx.android.synthetic.main.activity_main.*
@@ -13,7 +16,7 @@ import java.lang.reflect.Field
 import java.util.*
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : FragmentActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +51,14 @@ class MainActivity : AppCompatActivity() {
 
         Log.e("转换", "${10.dp}")
         Log.e("转换", "${10f.dp}")
+        val path = Environment.getExternalStorageDirectory().absolutePath
 
+        ivScreenshots.setOnClickListener {
+//            getbBitmap(llMain)
+            //某些版本下似乎是需要在底部加边距才能完整截屏
+            llMain.toPng(path, "${System.currentTimeMillis()}.png")
+            ShowToast("截图成功")
+        }
         var mobile = getCommonPreference("mobile", 0)
 //        Log.e("输出mobile", "getCommonPreference =$mobile")
 //        var list = ArrayList<String>()
@@ -77,8 +87,8 @@ class MainActivity : AppCompatActivity() {
         et_path.setText(Environment.getExternalStorageDirectory().toString() + "/")
         shareFile.setOnClickListener {
             requestEasyPermission(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) {
                 var url = stringMerge(et_path.text.toString())
                 Log.e("成功", "合并成功$url")
@@ -86,6 +96,47 @@ class MainActivity : AppCompatActivity() {
 //                shareSystem(url)
             }
         }
+    }
+
+    /**
+     * 截图listview
+     */
+    fun getbBitmap(listView: ViewGroup): Bitmap? {
+        var h = 0
+        var bitmap: Bitmap? = null
+        // 获取listView实际高度
+        for (i in 0 until listView.getChildCount()) {
+            val view = listView.getChildAt(i)
+            h += view.getHeight()
+        }
+        // 创建对应大小的bitmap
+        bitmap = Bitmap.createBitmap(
+            listView.getWidth(), h,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        listView.draw(canvas)
+        val path = Environment.getExternalStorageDirectory().absolutePath
+
+        bitmap.saveBitmapToSD(path, "test1.png", 100, 1f)
+        ShowToast("成功")
+        // 测试输出
+//        var out: FileOutputStream? = null
+//        try {
+//            out = FileOutputStream("/sdcard/screen_test.png")
+//        } catch (e: FileNotFoundException) {
+//            e.printStackTrace()
+//        }
+//        try {
+//            if (null != out) {
+//                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+//                out.flush()
+//                out.close()
+//            }
+//        } catch (e: IOException) {
+//            // TODO: handle exception
+//        }
+        return bitmap
     }
 
     fun getFiledsInfo(className: String): List<Field> {

@@ -6,6 +6,9 @@ import android.graphics.Matrix
 import android.graphics.Rect
 import android.media.ExifInterface
 import android.os.Environment
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.widget.NestedScrollView
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -98,7 +101,10 @@ fun readPictureDegree(path: String): Int {
     var degree = 0
     try {
         val exifInterface = ExifInterface(path)
-        when (exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+        when (exifInterface.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )) {
             ExifInterface.ORIENTATION_ROTATE_90 -> degree = 90
             ExifInterface.ORIENTATION_ROTATE_180 -> degree = 180
             ExifInterface.ORIENTATION_ROTATE_270 -> degree = 270
@@ -178,44 +184,57 @@ fun extractThumbnail(source: Bitmap, width: Int, height: Int): Bitmap? {
  * @param options options used during thumbnail extraction
  */
 fun extractThumbnail(
-        source: Bitmap?, width: Int, height: Int, options: Int): Bitmap? {
+    source: Bitmap?, width: Int, height: Int, options: Int
+): Bitmap? {
     if (source == null) {
         return null
     }
     val matrix = Matrix()
     matrix.setScale(1f, 1f)
-    return transform(matrix, source, width, height,
-            1 or options)
+    return transform(
+        matrix, source, width, height,
+        1 or options
+    )
 }
 
 /**
  * Transform source Bitmap to targeted width and height.
  */
-private fun transform(scaler: Matrix?, source: Bitmap, targetWidth: Int, targetHeight: Int, options: Int): Bitmap {
+private fun transform(
+    scaler: Matrix?,
+    source: Bitmap,
+    targetWidth: Int,
+    targetHeight: Int,
+    options: Int
+): Bitmap {
     var scaler = scaler
     val scaleUp = options and 1 != 0
     val recycle = options and 1 != 0
     val deltaX = source.width - targetWidth
     val deltaY = source.height - targetHeight
     if (!scaleUp && (deltaX < 0 || deltaY < 0)) {
-        val b2 = Bitmap.createBitmap(targetWidth, targetHeight,
-                Bitmap.Config.ARGB_8888)
+        val b2 = Bitmap.createBitmap(
+            targetWidth, targetHeight,
+            Bitmap.Config.ARGB_8888
+        )
         val c = Canvas(b2)
 
         val deltaXHalf = max(0, deltaX / 2)
         val deltaYHalf = max(0, deltaY / 2)
         val src = Rect(
-                deltaXHalf,
-                deltaYHalf,
-                deltaXHalf + min(targetWidth, source.width),
-                deltaYHalf + min(targetHeight, source.height))
+            deltaXHalf,
+            deltaYHalf,
+            deltaXHalf + min(targetWidth, source.width),
+            deltaYHalf + min(targetHeight, source.height)
+        )
         val dstX = (targetWidth - src.width()) / 2
         val dstY = (targetHeight - src.height()) / 2
         val dst = Rect(
-                dstX,
-                dstY,
-                targetWidth - dstX,
-                targetHeight - dstY)
+            dstX,
+            dstY,
+            targetWidth - dstX,
+            targetHeight - dstY
+        )
         c.drawBitmap(source, src, dst, null)
         if (recycle) {
             source.recycle()
@@ -246,8 +265,10 @@ private fun transform(scaler: Matrix?, source: Bitmap, targetWidth: Int, targetH
     }
 
     val b1: Bitmap
-    b1 = if (scaler != null) Bitmap.createBitmap(source, 0, 0,
-            source.width, source.height, scaler, true) else {
+    b1 = if (scaler != null) Bitmap.createBitmap(
+        source, 0, 0,
+        source.width, source.height, scaler, true
+    ) else {
         source
     }
 
@@ -313,8 +334,10 @@ fun blur(`in`: IntArray, out: IntArray, width: Int, height: Int, radius: Float) 
         var tg = 0
         var tb = 0
         for (i in -r..r) {
-            val rgb = `in`[inIndex + clamp(i, 0,
-                    width - 1)]
+            val rgb = `in`[inIndex + clamp(
+                i, 0,
+                width - 1
+            )]
             ta += rgb shr 24 and 0xff
             tr += rgb shr 16 and 0xff
             tg += rgb shr 8 and 0xff
@@ -345,3 +368,30 @@ fun blur(`in`: IntArray, out: IntArray, width: Int, height: Int, radius: Float) 
 fun clamp(x: Int, a: Int, b: Int): Int {
     return if (x < a) a else if (x > b) b else x
 }
+
+/**
+ * View转Bitmap
+ */
+fun View.toBitmap(path: String, name: String): Bitmap {
+    // 创建对应大小的bitmap
+    var viewHeight = 0
+    if (this is ViewGroup) {
+        for (i in 0 until childCount) {
+            viewHeight += getChildAt(i).height
+        }
+    } else {
+        height
+    }
+    var bitmap = Bitmap.createBitmap(width, viewHeight, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    draw(canvas)
+    return bitmap
+}
+
+/**
+ * View保存成PNG图片
+ */
+fun View.toPng(path: String, name: String) {
+    toBitmap(path, name).saveBitmapToSD(path, name, 100, 1f)
+}
+
