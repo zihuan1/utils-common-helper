@@ -1,6 +1,5 @@
 package com.zihuan.utils.cmhlibrary
 
-import android.content.Context
 import java.util.regex.Pattern
 
 
@@ -82,6 +81,24 @@ fun Int.isNotEmpty() = this > 0
 fun Long.isEmpty() = this <= 0
 fun Long.isNotEmpty() = this > 0
 
+
+/**
+ * 反转布尔类型的集合
+ */
+fun MutableList<Boolean>.forEachReverseIndex(index: Int): MutableList<Boolean> {
+    val listSize = size
+    if (listSize < 2) return this
+    val refer = if (index != 0) get(0) else get(index + 1)
+    this.clear()
+    for (pos in 0..listSize) {
+        if (pos != index) {
+            add(!refer)
+        } else {
+            add(refer)
+        }
+    }
+    return this
+}
 
 //dp转px
 var Int.px: Int
