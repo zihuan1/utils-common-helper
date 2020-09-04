@@ -41,9 +41,9 @@ fun Bitmap.saveBitmapToSD(path: String, fileName: String, quality: Int, fScale: 
         }
         newBitmap!!.compress(Bitmap.CompressFormat.PNG, quality, stream)
         url = pFilePath.absolutePath
-        out.close()
         stream.flush()//输出
         stream.close()//关闭
+        out.close()
         newBitmap.recycle()
         newBitmap = null
         Logger("保存成功" + pFilePath.absolutePath)

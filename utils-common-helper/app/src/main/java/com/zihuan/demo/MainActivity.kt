@@ -2,6 +2,7 @@ package com.zihuan.demo
 
 import android.Manifest
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.Bundle
 import android.os.Environment
@@ -54,8 +55,7 @@ class MainActivity : FragmentActivity() {
         val path = Environment.getExternalStorageDirectory().absolutePath
 
         ivScreenshots.setOnClickListener {
-//            getbBitmap(llMain)
-            //某些版本下似乎是需要在底部加边距才能完整截屏
+            getbBitmap(llMain)
             llMain.toPng(path, "${System.currentTimeMillis()}.png")
             ShowToast("截图成功")
         }
@@ -84,6 +84,11 @@ class MainActivity : FragmentActivity() {
 //            it.isAccessible = true
 //            var a = it.get("mList")
 //        }
+        requestEasyPermission(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) {
+        }
         et_path.setText(Environment.getExternalStorageDirectory().toString() + "/")
         shareFile.setOnClickListener {
             requestEasyPermission(
@@ -117,9 +122,9 @@ class MainActivity : FragmentActivity() {
         val canvas = Canvas(bitmap)
         listView.draw(canvas)
         val path = Environment.getExternalStorageDirectory().absolutePath
-
-        bitmap.saveBitmapToSD(path, "test1.png", 100, 1f)
+        val url = bitmap.saveBitmapToSD(path, "test1.png", 100, 1f)
         ShowToast("成功")
+        ivTest2.setImageBitmap(BitmapFactory.decodeFile(url))
         // 测试输出
 //        var out: FileOutputStream? = null
 //        try {
