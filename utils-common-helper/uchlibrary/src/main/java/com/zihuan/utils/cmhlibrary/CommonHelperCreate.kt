@@ -9,6 +9,7 @@ private lateinit var mContext: Context
   var preferenceAsyn = true
 
 object CommonHelperCreate {
+    @JvmStatic
     fun setContext(context: Context) {
         mContext = context
     }
