@@ -1,8 +1,5 @@
 package com.zihuan.demo;
 
-import com.zihuan.utils.cmhlibrary.BitmapHeplerKt;
-import com.zihuan.utils.cmhlibrary.CommonHelperCreate;
-
 import java.util.ArrayList;
 import java.util.List;
 
