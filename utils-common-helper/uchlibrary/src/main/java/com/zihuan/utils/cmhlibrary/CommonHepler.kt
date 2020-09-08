@@ -2,15 +2,17 @@ package com.zihuan.utils.cmhlibrary
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Point
 import android.location.LocationManager
 import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Handler
+import android.util.DisplayMetrics
 import android.view.Gravity
-import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
-import java.text.FieldPosition
 
 
 /**
@@ -112,12 +114,52 @@ fun dip2px(dpValue: Float): Int {
     return (dpValue * scale + 0.5f).toInt()
 }
 
+
 //把px转换成dp
 fun px2dip(pxValue: Float): Int {
     val scale = CommonContext.resources.displayMetrics.density
     return (pxValue / scale + 0.5f).toInt()
 }
 
+
+/**
+ * 获取屏幕宽高
+ */
+val screenWidth by lazy {
+    screenWidth()
+}
+val screenHeight by lazy {
+    getScreenRealHeight()
+}
+
+/**
+ * 获取屏幕宽高
+ */
+fun screenWidth(): Int {
+    return CommonContext.resources.displayMetrics.widthPixels
+}
+
+
+/**
+ * 获取屏幕可用高度，不包含屏幕安全区
+ */
+fun screenHeight(): Int {
+    return CommonContext.resources.displayMetrics.heightPixels
+}
+
+/**
+ * 获取屏幕实际高度包含异形屏等安全区域
+ */
+fun getScreenRealHeight(): Int {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        return screenHeight()
+    }
+    val windowManager = (CommonContext.getSystemService(Context.WINDOW_SERVICE)) as WindowManager
+    val display = windowManager?.defaultDisplay
+    val point = Point()
+    display?.getRealSize(point)
+    return point.y
+}
 
 private var mToast: Toast? = null
 

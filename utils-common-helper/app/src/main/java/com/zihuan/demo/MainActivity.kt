@@ -101,6 +101,7 @@ class MainActivity : FragmentActivity() {
 //                shareSystem(url)
             }
         }
+        Log.e("宽高", "宽高$screenWidth  $screenHeight  ${screenHeight()}")
     }
 
     /**
