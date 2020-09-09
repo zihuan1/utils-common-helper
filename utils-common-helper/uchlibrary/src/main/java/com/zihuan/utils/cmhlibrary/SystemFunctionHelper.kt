@@ -8,6 +8,7 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
@@ -151,7 +152,11 @@ fun Context.refreshFile(filePath: String, action: () -> Unit) {
     MediaScannerConnection.scanFile(
         this,
         arrayOf(file.toString()),
-        arrayOf(mtm.getMimeTypeFromExtension(file.toString().substring(file.toString().lastIndexOf(".") + 1)))
+        arrayOf(
+            mtm.getMimeTypeFromExtension(
+                file.toString().substring(file.toString().lastIndexOf(".") + 1)
+            )
+        )
     ) { path, uri -> action() }
 }
 
@@ -165,3 +170,27 @@ fun Context.refreshGallery(filePath: String) {
     sendBroadcast(localIntent)
 }
 
+
+/**
+ * 改变当前app亮度
+ *
+ */
+fun Activity.changeAppBrightness(brightness: Int = getSystemBrightness(this)) {
+    val window = window
+    val lp = window.attributes
+    lp.screenBrightness = (if (brightness <= 0) 1 else brightness) / 255f
+    window.attributes = lp
+}
+
+/**
+ * 获取当前系统亮度
+ */
+fun Context.getSystemBrightness(context: Context): Int {
+    var systemBrightness = 0
+    try {
+        systemBrightness =
+            Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS)
+    } catch (e: Settings.SettingNotFoundException) {
+    }
+    return systemBrightness
+}
