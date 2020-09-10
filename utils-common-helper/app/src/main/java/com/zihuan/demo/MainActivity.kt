@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
+import android.provider.Telephony.Sms
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.Toast
@@ -89,6 +91,20 @@ class MainActivity : FragmentActivity() {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) {
         }
+        val contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+//        val contentUri = MediaStore.Files.getContentUri("external")
+
+        val sortOrder = MediaStore.Files.FileColumns.DATE_MODIFIED
+//        val cursor= contentResolver.query(contentUri, null, null, null, sortOrder)
+//
+        val cursor =
+            managedQuery(contentUri, null, null, null, sortOrder)
+        Log.e("数量", cursor.count.toString())
+        while (cursor.moveToNext()) {
+            val path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))// 路径
+            Log.e("cursor", path)
+        }
+//        QueryHandler(contentResolver).startQuery(0, null, contentUri, null, null, null, sortOrder)
         et_path.setText(Environment.getExternalStorageDirectory().toString() + "/")
         shareFile.setOnClickListener {
             requestEasyPermission(

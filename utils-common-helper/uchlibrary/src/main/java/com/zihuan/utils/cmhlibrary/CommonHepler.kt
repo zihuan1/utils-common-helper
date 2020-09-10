@@ -7,7 +7,6 @@ import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Handler
-import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -49,6 +48,11 @@ fun EditText.hideKeyboard(): EditText {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(this.windowToken, 0)
     return this
+}
+
+fun hideKeyboard() {
+    val imm = CommonContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
 }
 
 /**
