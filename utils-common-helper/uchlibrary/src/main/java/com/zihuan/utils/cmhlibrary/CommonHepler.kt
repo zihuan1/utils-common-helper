@@ -8,6 +8,7 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Handler
 import android.view.Gravity
+import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -163,6 +164,18 @@ fun getScreenRealHeight(): Int {
     val point = Point()
     display?.getRealSize(point)
     return point.y
+}
+
+/**
+ * 获取view真实的宽高信息
+ */
+fun View.getRealInfo(): Array<Int> {
+    val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    measure(widthSpec, heightSpec)
+    val measuredWidth = measuredWidth
+    val measuredHeight = measuredHeight
+    return arrayOf(measuredWidth, measuredHeight)
 }
 
 private var mToast: Toast? = null
