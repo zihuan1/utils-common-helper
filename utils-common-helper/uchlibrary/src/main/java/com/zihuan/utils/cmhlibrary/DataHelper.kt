@@ -101,12 +101,12 @@ fun MutableList<Boolean>.forEachReverseIndex(index: Int): MutableList<Boolean> {
 }
 
 //dp转px
-var Int.px: Int
-    get() = this.toFloat().px.toInt()
+var Int.dp: Int
+    get() = this.toFloat().dp.toInt()
     set(value) {
     }
 
-var Float.px: Float
+var Float.dp: Float
     get() = CommonContext.resources.displayMetrics.density * this
     set(value) {
     }
@@ -120,20 +120,20 @@ var Float.spx: Float
     set(value) {}
 
 // px转dp
-var Int.dp: Int
-    get() = this.toFloat().dp.toInt()
+var Int.px: Int
+    get() = this.toFloat().px.toInt()
     set(value) {}
 
-var Float.dp: Float
+var Float.px: Float
     get() = this / CommonContext.resources.displayMetrics.density
     set(value) {}
 
 //px转sp
-var Int.sp: Int
-    get() = this.toFloat().sp.toInt()
+var Int.xsp: Int
+    get() = this.toFloat().xsp.toInt()
     set(value) {}
 
-var Float.sp: Float
+var Float.xsp: Float
     get() = this / CommonContext.resources.displayMetrics.scaledDensity
     set(value) {}
 
