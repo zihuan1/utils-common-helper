@@ -100,14 +100,15 @@ fun checkGPSIsOpen(): Boolean {
     return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 }
 
+val statusBarHeight by lazy { getScreenStatusBarHeight() }
+
 /**
  * 状态栏高度
  *
- * @param activity
- * @return
+ * @return px
  */
-fun getStatusBarHeight(activity: Activity): Int {
-    val resources = activity.resources
+fun getScreenStatusBarHeight(): Int {
+    val resources = CommonContext.resources
     val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
     return resources.getDimensionPixelSize(resourceId)
 }
