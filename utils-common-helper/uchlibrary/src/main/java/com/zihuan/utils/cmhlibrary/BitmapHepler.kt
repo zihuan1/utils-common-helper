@@ -1,14 +1,11 @@
 package com.zihuan.utils.cmhlibrary
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Matrix
-import android.graphics.Rect
+import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.media.ExifInterface
-import android.os.Environment
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.NestedScrollView
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -24,7 +21,12 @@ import kotlin.math.min
  * @param quality     保存的质量（1-100）
  * @param fScale      压缩比率 1为原图
  */
-fun Bitmap.saveBitmapToSD(path: String, fileName: String, quality: Int, fScale: Float = 1f): String {
+fun Bitmap.saveBitmapToSD(
+    path: String,
+    fileName: String,
+    quality: Int,
+    fScale: Float = 1f
+): String {
     val pFileDir = File(path)
     var url = ""
     val pFilePath = File(pFileDir, fileName)
@@ -89,6 +91,26 @@ fun compressImage(argBitmap: Bitmap, fScale: Float): Bitmap {
         bm = null
     }
     return newbm
+}
+
+/**
+ *  drawable转Bitmap
+ */
+fun drawableToBitmap(vectorDrawableId: Int): Bitmap {
+    var bitmap: Bitmap? = null
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+        val vectorDrawable: Drawable = CommonContext.getDrawable(vectorDrawableId)
+        bitmap = Bitmap.createBitmap(
+            vectorDrawable.intrinsicWidth,
+            vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
+        vectorDrawable.draw(canvas)
+    } else {
+        bitmap = BitmapFactory.decodeResource(CommonContext.resources, vectorDrawableId)
+    }
+    return bitmap
 }
 
 /**
@@ -295,7 +317,7 @@ private fun transform(
  * @param bmp
  * @return
  */
-fun BoxBlurFilter(bmp: Bitmap): Bitmap {
+fun boxBlurFilter(bmp: Bitmap): Bitmap {
     /** 水平方向模糊度  */
     val hRadius = 10f
 

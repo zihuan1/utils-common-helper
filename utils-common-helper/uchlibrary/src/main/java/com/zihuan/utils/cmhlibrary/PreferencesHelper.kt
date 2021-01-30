@@ -2,6 +2,7 @@ package com.zihuan.utils.cmhlibrary
 
 import android.content.Context
 import android.widget.Toast
+import org.jetbrains.annotations.Nullable
 
 
 /**
@@ -9,9 +10,13 @@ import android.widget.Toast
  * 存储工作是异步的
  */
 
+private var mName = "commonDefaultName"
+fun setPreferencesName(@Nullable name: String) {
+    mName = name
+}
 
 private val prefs by lazy {
-    CommonContext.getSharedPreferences("default", Context.MODE_PRIVATE)
+    CommonContext.getSharedPreferences(mName, Context.MODE_PRIVATE)
 }
 
 
@@ -25,6 +30,7 @@ fun Number.savePreference(key: String) {
 fun String.savePreference(key: String) {
     putPreference(key, this)
 }
+
 fun Boolean.savePreference(key: String) {
     putPreference(key, this)
 }
@@ -47,7 +53,8 @@ fun <T> putPreference(key: String, value: T) {
             is Float -> putFloat(key, value)
             is Long -> putLong(key, value)
             is Boolean -> putBoolean(key, value)
-            else -> Toast.makeText(CommonContext, "Preference不支持的类型$value", Toast.LENGTH_LONG).show()
+            else -> Toast.makeText(CommonContext, "Preference不支持的类型$value", Toast.LENGTH_LONG)
+                .show()
         }
         if (preferenceAsyn) apply() else commit()
     }
@@ -61,12 +68,18 @@ fun <T> findPreference(key: String, defValue: T): T {
             is Float -> getFloat(key, defValue)
             is Long -> getLong(key, defValue)
             is Boolean -> getBoolean(key, defValue)
-            else -> Toast.makeText(CommonContext, "Preference不支持的类型$defValue", Toast.LENGTH_LONG).show()
+            else -> Toast.makeText(CommonContext, "Preference不支持的类型$defValue", Toast.LENGTH_LONG)
+                .show()
         }
     } as T
 }
 
-
+/**
+ * 清除所有数据
+ */
+fun clearCommonPreference() {
+    prefs.edit().clear().commit()
+}
 //    存储集合
 //fun putHashMap(key: String, hashmap: HashMap<String, Int>): Boolean {
 //    val settings = PreferenceManager.getDefaultSharedPreferences(MainApplication.getInstance())
@@ -119,15 +132,4 @@ fun <T> findPreference(key: String, defValue: T): T {
 //            .readObject() as HashMap<String, Int>
 //    objectInputStream.close()
 //    return SceneList
-//}
-/**
- * 清除所有数据
- */
-//fun clearPreferences() {
-//    val sharedPreferences = PreferenceManager
-//            .getDefaultSharedPreferences(MainApplication.getInstance())
-//    val editor = sharedPreferences.edit()
-//    //        editor.putLong(key, value);
-//    editor.clear()
-//    editor.commit()
 //}
