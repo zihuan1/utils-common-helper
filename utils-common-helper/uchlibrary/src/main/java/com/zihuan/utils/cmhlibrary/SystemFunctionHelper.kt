@@ -175,10 +175,10 @@ fun Context.refreshGallery(filePath: String) {
  * 改变当前app亮度
  *
  */
-fun Activity.changeAppBrightness(brightness: Int = getSystemBrightness(this)) {
+fun Activity.changeAppBrightness(brightness: Float) {
     val window = window
     val lp = window.attributes
-    lp.screenBrightness = (if (brightness <= 0) 1 else brightness) / 255f
+    lp.screenBrightness = brightness
     window.attributes = lp
 }
 
