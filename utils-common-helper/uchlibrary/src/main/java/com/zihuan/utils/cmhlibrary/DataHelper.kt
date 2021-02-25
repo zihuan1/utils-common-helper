@@ -147,11 +147,21 @@ var Float.xsp: Float
 /**
  * 返回第一个非零的数字
  */
-fun IntNotZero(vararg args: Int): Int {
+fun firstNotZero(vararg args: Int): Int {
     args.forEach {
         if (it > 0) return it
     }
     return 0
+}
+
+/**
+ * 保留小数
+ */
+fun String.saveDecimal(number: Int = 2) {
+    val num = if (!isNullOrEmpty()) {
+        this
+    } else "0"
+    "%.$number".format(this.toDouble())
 }
 
 /**
@@ -163,7 +173,7 @@ fun Int.lessNineAddZero() = if (this.lessThanNine()) "0$this" else this.toString
  * 返回第一个非空的字符
  * 适用于有多个参数,但不知道哪个参数不为空
  */
-fun StringDetermineEmpty(vararg args: String): String {
+fun stringDetermineEmpty(vararg args: String): String {
     args.forEach {
         if (!it.isNullOrBlank()) return it
     }

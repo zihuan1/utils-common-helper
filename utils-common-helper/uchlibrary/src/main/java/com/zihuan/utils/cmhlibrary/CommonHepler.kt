@@ -66,7 +66,7 @@ fun EditText.cursorMoveToEnd(): EditText {
 }
 
 /**
- * 广播移动到指定位置
+ * 光标移动到指定位置
  */
 fun EditText.cursorMoveToPosition(position: Int): EditText {
     if (!text.isNullOrBlank() && text.length >= position)
@@ -187,7 +187,7 @@ private var mToast: Toast? = null
  *
  * @param argText
  */
-fun ShowToast(argText: String) {
+fun showToast(argText: String) {
     val mainHandler = Handler(CommonContext.mainLooper)
     val myRunnable = Runnable {
         if (mToast != null) {
