@@ -13,6 +13,13 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.jetbrains.anko.startActivity
+import java.lang.invoke.ConstantCallSite
 
 
 /**
@@ -179,8 +186,37 @@ fun View.getRealInfo(): Array<Int> {
     return arrayOf(measuredWidth, measuredHeight)
 }
 
-private var mToast: Toast? = null
+/**
+ * 子线程协程
+ */
+fun globalScopeIO(action: () -> Unit) {
+    GlobalScope.launch(Dispatchers.IO) {
+        action()
+    }
+}
 
+/**
+ * 主线程协程
+ */
+fun globalScopeMain(action: () -> Unit) {
+    GlobalScope.launch(Dispatchers.Main) {
+        action()
+    }
+}
+
+/**
+ * 延迟
+ */
+fun globalDelayPerform(timeMillis: Long, action: () -> Unit) {
+    GlobalScope.launch(Dispatchers.IO) {
+        delay(timeMillis)
+        globalScopeMain {
+            action()
+        }
+    }
+}
+
+private var mToast: Toast? = null
 
 /**
  * Toast
@@ -200,3 +236,43 @@ fun showToast(argText: String) {
     }
     mainHandler.post(myRunnable)
 }
+
+fun CommonContext.getVersionName(): String {
+    val pm = packageManager
+    val p1 = pm.getPackageInfo(packageName, 0)
+    return p1.versionName
+}
+
+fun CommonContext.getVersionCode(): Long {
+    val pm = packageManager
+    val p1 = pm.getPackageInfo(packageName, 0)
+    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+        p1.longVersionCode
+    } else {
+        p1.versionCode.toLong()
+    }
+}
+
+/**
+ * 全局跳转页面方法
+ */
+inline fun <reified T : Activity> Context.startActivityPro(vararg params: Pair<String, Any>) {
+    startActivity<T>(*params)
+}
+
+inline fun <reified T : Activity> Context.startActivityPro(
+    vararg params: Pair<String, Any>,
+    action: () -> Boolean
+) {
+    if (action())
+        startActivity<T>(*params)
+}
+
+inline fun <reified T : Activity> Fragment.startActivityPro(vararg params: Pair<String, Any>) {
+    context!!.startActivityPro<T>(*params)
+}
+
+inline fun <reified T : Activity> View.startActivityPro(vararg params: Pair<String, Any>) {
+    context.startActivityPro<T>(*params)
+}
+

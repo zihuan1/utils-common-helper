@@ -14,6 +14,9 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.zihuan.utils.cmhlibrary.*
 import com.zihuan.utils.cmhlibrary.FileUtils.stringMerge
+import com.zihuan.utils.cmhlibrary.simple.animEnd
+import com.zihuan.utils.cmhlibrary.simple.animStart
+import com.zihuan.utils.cmhlibrary.simple.animUpdate
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.reflect.Field
 import java.util.*
@@ -59,7 +62,7 @@ class MainActivity : FragmentActivity() {
         ivScreenshots.setOnClickListener {
             getbBitmap(llMain)
             llMain.toPng(path, "${System.currentTimeMillis()}.png")
-            ShowToast("截图成功")
+            showToast("截图成功")
         }
         var mobile = getCommonPreference("mobile", 0)
 //        Log.e("输出mobile", "getCommonPreference =$mobile")
@@ -101,7 +104,8 @@ class MainActivity : FragmentActivity() {
             managedQuery(contentUri, null, null, null, sortOrder)
         Log.e("数量", cursor.count.toString())
         while (cursor.moveToNext()) {
-            val path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))// 路径
+            val path =
+                cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))// 路径
             Log.e("cursor", path)
         }
 //        QueryHandler(contentResolver).startQuery(0, null, contentUri, null, null, null, sortOrder)
@@ -140,8 +144,9 @@ class MainActivity : FragmentActivity() {
         listView.draw(canvas)
         val path = Environment.getExternalStorageDirectory().absolutePath
         val url = bitmap.saveBitmapToSD(path, "test1.png", 100, 1f)
-        ShowToast("成功")
+        showToast("成功")
         ivTest2.setImageBitmap(BitmapFactory.decodeFile(url))
+        ivTest2.animate().alpha(1f).animStart { }
         // 测试输出
 //        var out: FileOutputStream? = null
 //        try {
