@@ -6,6 +6,7 @@ import android.graphics.Point
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.view.Gravity
 import android.view.View
@@ -19,7 +20,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.startActivity
-import java.lang.invoke.ConstantCallSite
 
 
 /**
@@ -252,6 +252,43 @@ fun CommonContext.getVersionCode(): Long {
         p1.versionCode.toLong()
     }
 }
+
+/**
+ * 获取当前应用缓存路径.
+ * @param invisibleCache 不可见缓存路径
+ */
+fun getDiskCacheFile(invisibleCache: Boolean = false): String {
+    var path: String? = null
+    val visibleCache = Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
+            || !Environment.isExternalStorageRemovable()
+    path = if (visibleCache && !invisibleCache) {
+        //长时间存放的数据 /sdcard/Android/data/包名/file
+        CommonContext.getExternalFilesDir("").path
+    } else {
+        //获取到的是 /data/data/包名/file
+        CommonContext.filesDir.path
+    }
+    return path
+}
+
+/**
+ * 获取当前应用缓存路径.
+ * @param invisibleCache 不可见缓存路径
+ */
+fun getDiskCacheData(invisibleCache: Boolean = false): String {
+    var cachePath: String? = null
+    val visibleCache = Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
+            || !Environment.isExternalStorageRemovable()
+    cachePath = if (visibleCache && !invisibleCache) {
+        //临时数据 /sdcard/Android/data/包名/cache
+        CommonContext.externalCacheDir.path
+    } else {
+        //获取到的是 /data/data/包名/cache
+        CommonContext.cacheDir.path
+    }
+    return cachePath
+}
+
 
 /**
  * 全局跳转页面方法

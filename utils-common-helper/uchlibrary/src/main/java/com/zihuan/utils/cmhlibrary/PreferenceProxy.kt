@@ -1,7 +1,6 @@
 package com.zihuan.utils.cmhlibrary
 
 import android.content.Context
-import android.widget.Toast
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -12,7 +11,7 @@ class PreferenceProxy<T>(val key: String, val default: T, val preName: String = 
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        return findPreference(key,default)
+        return getPreference(key,default)
     }
 
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {

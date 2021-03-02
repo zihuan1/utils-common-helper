@@ -394,7 +394,7 @@ fun clamp(x: Int, a: Int, b: Int): Int {
 /**
  * View转Bitmap
  */
-fun View.toBitmap(path: String, name: String): Bitmap {
+fun View.toBitmap(): Bitmap {
     // 创建对应大小的bitmap
     var viewHeight = 0
     if (this is ViewGroup) {
@@ -414,6 +414,6 @@ fun View.toBitmap(path: String, name: String): Bitmap {
  * View保存成PNG图片
  */
 fun View.toPng(path: String, name: String) {
-    toBitmap(path, name).saveBitmapToSD(path, name, 100, 1f)
+    toBitmap().saveBitmapToSD(path, name, 100, 1f)
 }
 

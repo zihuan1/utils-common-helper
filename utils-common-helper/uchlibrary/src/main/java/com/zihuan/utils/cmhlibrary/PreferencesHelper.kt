@@ -22,6 +22,7 @@ private val prefs by lazy {
 
 /**
  * 存储值
+ * Double类型的数据会自动转换成String类型存储
  */
 fun Number.savePreference(key: String) {
     putPreference(key, this)
@@ -40,15 +41,14 @@ fun Boolean.savePreference(key: String) {
  * 快速的获取值
  * var value=getCommonPreference()
  */
-fun <T : Any> getCommonPreference(key: String, defValue: T): T {
-
-    return findPreference(key, defValue)
+fun <T : Any> findPreference(key: String, defValue: T): T {
+    return getPreference(key, defValue)
 }
 
-fun <T> putPreference(key: String, value: T) {
+internal fun <T> putPreference(key: String, value: T) {
     prefs.edit().apply {
         when (value) {
-            is String -> putString(key, value)
+            is String, is Double -> putString(key, value.toString())
             is Int -> putInt(key, value)
             is Float -> putFloat(key, value)
             is Long -> putLong(key, value)
@@ -60,7 +60,7 @@ fun <T> putPreference(key: String, value: T) {
     }
 }
 
-fun <T> findPreference(key: String, defValue: T): T {
+internal fun <T> getPreference(key: String, defValue: T): T {
     return with(prefs) {
         when (defValue) {
             is String -> getString(key, defValue)
