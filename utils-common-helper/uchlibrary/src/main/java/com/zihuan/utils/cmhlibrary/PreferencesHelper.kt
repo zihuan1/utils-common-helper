@@ -77,7 +77,7 @@ internal fun <T> getPreference(key: String, defValue: T): T {
 /**
  * 清除所有数据
  */
-fun clearCommonPreference() {
+fun clearPreference() {
     prefs.edit().clear().commit()
 }
 //    存储集合
