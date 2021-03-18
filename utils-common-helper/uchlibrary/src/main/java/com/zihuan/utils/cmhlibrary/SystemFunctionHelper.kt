@@ -7,13 +7,14 @@ import android.graphics.Bitmap
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.os.StatFs
 import android.provider.MediaStore
 import android.provider.Settings
-import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import java.io.File
-import java.util.*
+import android.text.format.Formatter
 
 val SELECT_FILE_REQUESTCODE = 10086
 
@@ -193,4 +194,32 @@ fun Context.getSystemBrightness(context: Context): Int {
     } catch (e: Settings.SettingNotFoundException) {
     }
     return systemBrightness
+}
+
+/**
+ * 获取已用存储空间
+ *
+ * @return 以M,G为单位的容量
+ */
+fun Context.getMemorySize(): String {
+    val file = Environment.getDataDirectory()
+    val statFs = StatFs(file.path)
+    val blockSizeLong = statFs.blockSizeLong
+    val blockCountLong = statFs.blockCountLong
+    val size = blockCountLong * blockSizeLong
+    return Formatter.formatFileSize(this, size)
+}
+
+
+/**
+ * 获取手机可用存储空间
+ *
+ * @return 以M,G为单位的容量
+ */
+fun Context.getAvailableMemorySize(): String {
+    val file = Environment.getDataDirectory()
+    val statFs = StatFs(file.path)
+    val availableBlocksLong = statFs.availableBlocksLong
+    val blockSizeLong = statFs.blockSizeLong
+    return Formatter.formatFileSize(this, availableBlocksLong * blockSizeLong)
 }
