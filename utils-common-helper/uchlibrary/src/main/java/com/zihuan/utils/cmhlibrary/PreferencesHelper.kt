@@ -4,10 +4,7 @@ import android.content.Context
 import android.util.Base64
 import android.widget.Toast
 import org.jetbrains.annotations.Nullable
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
+import java.io.*
 
 
 /**
@@ -93,7 +90,7 @@ fun putHashMap(key: String, hashmap: HashMap<String, Int>): Boolean {
         val liststr = SceneList2String(hashmap)
         editor.putString(key, liststr)
     } catch (e: IOException) {
-
+        showToast("存储Map错误$e")
     }
 
     return editor.commit()
