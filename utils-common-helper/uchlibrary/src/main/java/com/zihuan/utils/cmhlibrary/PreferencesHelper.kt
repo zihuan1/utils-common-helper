@@ -82,23 +82,22 @@ internal fun <T> getPreference(key: String, defValue: T): T {
 fun clearPreference() {
     prefs.edit().clear().commit()
 }
+
 //    存储集合
-fun putHashMap(key: String, hashmap: HashMap<String, Int>): Boolean {
-    val settings = PreferenceManager.getDefaultSharedPreferences(MainApplication.getInstance())
-    val editor = settings.edit()
+fun putHashMap(key: String, map: HashMap<String, Int>): Boolean {
+    val editor = prefs.edit()
     try {
-        val liststr = SceneList2String(hashmap)
-        editor.putString(key, liststr)
+        editor.putString(key, sceneList2String(map))
     } catch (e: IOException) {
         showToast("存储Map错误$e")
     }
 
     return editor.commit()
 }
+
 //
 fun getHashMap(key: String): HashMap<String, Int>? {
-    val settings = PreferenceManager.getDefaultSharedPreferences(MainApplication.getInstance())
-    val liststr = settings.getString(key, "")
+    val liststr = prefs.getString(key, "")
     try {
         return string2SceneList(liststr!!)
     } catch (e: Exception) {
@@ -107,20 +106,20 @@ fun getHashMap(key: String): HashMap<String, Int>? {
     return null
 }
 
-fun SceneList2String(hashmap: HashMap<String, Int>): String {
+private fun sceneList2String(hashmap: HashMap<String, Int>): String {
     // 实例化一个ByteArrayOutputStream对象，用来装载压缩后的字节文件。
     val byteArrayOutputStream = ByteArrayOutputStream()
     // 然后将得到的字符数据装载到ObjectOutputStream
     val objectOutputStream = ObjectOutputStream(
-            byteArrayOutputStream)
+        byteArrayOutputStream
+    )
     // writeObject 方法负责写入特定类的对象的状态，以便相应的 readObject 方法可以还原它
     objectOutputStream.writeObject(hashmap)
     // 最后，用Base64.encode将字节文件转换成Base64编码保存在String中
-    val SceneListString = String(Base64.encode(
-            byteArrayOutputStream.toByteArray(), Base64.DEFAULT))
+    val sceneListString = String(Base64.encode(byteArrayOutputStream.toByteArray(), Base64.DEFAULT))
     // 关闭objectOutputStream
     objectOutputStream.close()
-    return SceneListString
+    return sceneListString
 }
 
 private fun string2SceneList(SceneListString: String): HashMap<String, Int> {

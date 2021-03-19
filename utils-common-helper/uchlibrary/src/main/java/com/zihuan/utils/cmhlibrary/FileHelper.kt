@@ -628,6 +628,19 @@ fun renameFile(path: String, newName: String) {
         renameFile2(oldPath, newPath)
     }
 }
+/**
+ * 重命名文件并且覆盖后缀名
+ * @param path 文件路径
+ * @param newName 新的名字
+ */
+fun renameFileFill(path: String, newName: String) {
+    val file = File(path)
+    val oldPath = file.absolutePath
+    if (!TextUtils.isEmpty(oldPath)) {
+        var newPath = oldPath.replace(file.name, newName)
+        renameFile2(oldPath, newPath)
+    }
+}
 
 /**
  * oldPath 和 newPath必须是新旧文件的绝对路径
