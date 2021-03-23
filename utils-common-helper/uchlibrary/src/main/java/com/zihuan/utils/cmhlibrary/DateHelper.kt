@@ -5,9 +5,7 @@ import android.util.Log
 
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.ArrayList
-import java.util.Calendar
-import java.util.Date
+import java.util.*
 
 /**
  * 日期转换工具类
@@ -60,9 +58,10 @@ fun stampToDate(time: String, type: String): String {
 
 
 /**
- * 时间戳距当前多长时间 (ddHHmmss)
+ * 时间戳距当前多长时间
+ * dd_HH_mm_ss格式
  */
-fun stampFormDate_dd_HH_mm_ss(argTime: String?): String? {
+fun stampFormDate(argTime: String?): String? {
     if (argTime != null && argTime == "") {
         return ""
     }
@@ -77,7 +76,6 @@ fun stampFormDate_dd_HH_mm_ss(argTime: String?): String? {
     val iMinute = 60
     val iHour = 60 * iMinute
     val iDay = 24 * iHour
-
     Logger("second$interval")
     strTime = when {
         interval.toInt() in 1..59 -> "" + interval.toInt() + "秒前"
@@ -92,9 +90,10 @@ fun stampFormDate_dd_HH_mm_ss(argTime: String?): String? {
 }
 
 /**
- * 时间戳距当前多长时间 (yyyyMMddHHmmss)
+ * 时间戳距当前多长时间
+ * YY_MM_dd_HH_mm_ss 格式
  */
-fun stampFormDateYY_MM_dd_HH_mm_ss(argTime: Long): String {
+fun stampFormDate(argTime: Long): String {
     val mData = Date(argTime)
     val formatter = SimpleDateFormat("HH:mm")
     val dateString = formatter.format(argTime)
@@ -135,11 +134,7 @@ fun stampFormDateYY_MM_dd_HH_mm_ss(argTime: Long): String {
 }
 
 // 获得系统时间自定义类型
-fun getSysTimeType(type: String): String {
-    var type = type
-    if (TextUtils.isEmpty(type)) {
-        type = TIME_YYYY_MM_dd_HH_mm_ss
-    }
+fun getSysTimeType(type: String = TIME_YYYY_MM_dd_HH_mm_ss): String {
     val formatter = SimpleDateFormat(type)
     val curDate = Date(System.currentTimeMillis())//获取当前时间
     return formatter.format(curDate)
@@ -163,7 +158,6 @@ fun getAfterDay(time: String, type: String, day: Int): String {
     } catch (e: ParseException) {
         e.printStackTrace()
     }
-
     calendar.time = date
     //        calendar.add(Calendar.WEEK_OF_YEAR, -1);
     calendar.add(Calendar.DAY_OF_MONTH, +day)
@@ -194,8 +188,6 @@ fun getDateAmPm(time: String, type: String): String {
     } else {
         "pm"
     }
-    //       Logger("data"+ date);
-
     return date + ""
 }
 
@@ -221,7 +213,6 @@ var topWeek: MutableList<String> = ArrayList()
 fun getTopWeek(c: Int): List<*> {
     val sf = SimpleDateFormat("dd")
     val cal = Calendar.getInstance()
-    println("=========LastWeek Days=========")
     cal.add(Calendar.WEEK_OF_MONTH, c)
     for (i in 0..6) {
         cal.add(Calendar.DATE, -1 * cal.get(Calendar.DAY_OF_WEEK) + 2 + i)
@@ -235,7 +226,6 @@ fun getTopWeek(c: Int): List<*> {
  * 计算两个时间戳相隔多少天
  */
 fun getApartDay(a: String, b: String): Int {
-
     val sdf = SimpleDateFormat(TIME_YYYY_MM_dd)
     val day1 = sdf.format(Date(java.lang.Long.parseLong(a) * 1000))
     val day2 = sdf.format(Date(java.lang.Long.parseLong(b) * 1000))
@@ -247,22 +237,12 @@ fun getApartDay(a: String, b: String): Int {
     } catch (e: ParseException) {
         Logger("异常$e")
     }
-
     val cal = Calendar.getInstance()
     cal.time = d1
     val time1 = cal.timeInMillis
     cal.time = d2
     val time2 = cal.timeInMillis
     val betweenDays = (time2 - time1) / (1000 * 3600 * 24)
-
-
-    //        Log.e("betweenDays", betweenDays + "天");
-
-    //        if(betweenDays == 0) {   //半天
-    //            return "半";
-    //        }
-
-    //        return (Long.parseLong(b) - Long.parseLong(a)) / (86400000) + "";
     return Integer.parseInt(betweenDays.toString())
 }
 
@@ -332,7 +312,7 @@ fun timeStampDiffSecond(time1: String, time2: String): String {
  *
  * @return
  */
-fun GetToday(): Long {
+fun getToday(): Long {
     val strToday = getSysTimeType(TIME_YYYY_MM_dd)
     val today = dateToStamp("$strToday 00:00:00", TIME_YYYY_MM_dd_HH_mm_ss).toLong()
     return today / 1000
@@ -343,9 +323,32 @@ fun GetToday(): Long {
  *
  * @return
  */
-fun GetTomorrow(): Long {
-    val today = GetToday()
+fun getTomorrow(): Long {
+    val today = getToday()
     return today + 24 * 60 * 60
+}
+
+/**
+ * 将毫秒数格式化为"##:##"的时间
+ *
+ * @param milliseconds 毫秒数
+ * @return ##:##
+ */
+fun formatTime(milliseconds: Long): String {
+    if (milliseconds <= 0 || milliseconds >= 24 * 60 * 60 * 1000) {
+        return "00:00"
+    }
+    val totalSeconds = milliseconds / 1000
+    val seconds = totalSeconds % 60
+    val minutes = totalSeconds / 60 % 60
+    val hours = totalSeconds / 3600
+    val stringBuilder = StringBuilder()
+    val mFormatter = Formatter(stringBuilder, Locale.getDefault())
+    return if (hours > 0) {
+        mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString()
+    } else {
+        mFormatter.format("%02d:%02d", minutes, seconds).toString()
+    }
 }
 
 var DateUtilsDebug = false

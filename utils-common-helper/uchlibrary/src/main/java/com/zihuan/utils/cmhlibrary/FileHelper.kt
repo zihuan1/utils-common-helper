@@ -61,7 +61,6 @@ fun getFilesPath(@NotNull path: String, @NotNull files: ArrayList<File>): List<F
                 files.add(it)
             }
             Logger("文件夹" + it.absoluteFile)
-
         }
     }
     return files

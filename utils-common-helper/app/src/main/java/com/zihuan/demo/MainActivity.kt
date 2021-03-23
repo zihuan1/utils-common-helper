@@ -7,7 +7,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.zihuan.utils.cmhlibrary.*
-import com.zihuan.utils.cmhlibrary.FileUtils.stringMerge
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -50,7 +49,7 @@ class MainActivity : FragmentActivity() {
         Log.e("转换", "${10.dp}")
         Log.e("转换", "${10f.dp}")
         val path = Environment.getExternalStorageDirectory().absolutePath
-
+        Log.e("测试时间", "测试" + formatTime(31000))
         ivScreenshots.setOnClickListener {
             llMain.toPng(path, "${System.currentTimeMillis()}.png")
             showToast("截图成功")
