@@ -3,9 +3,11 @@ package com.zihuan.utils.cmhlibrary
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.BatteryManager
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
@@ -96,7 +98,7 @@ fun getPhotoAlbum(): List<Int> {
  * 分享文件
  * 分享文件类型
  */
-fun Context.shareSystem(filePath: String, type: String = "text") {
+fun shareSystem(filePath: String, type: String = "text") {
     val file = File(filePath)
     var shareIntent = Intent()
     // 判断版本大于等于7.0
@@ -104,7 +106,7 @@ fun Context.shareSystem(filePath: String, type: String = "text") {
         // "项目包名.fileprovider"即是在清单文件中配置的authorities
         // 给目标应用一个临时授权
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        FileProvider.getUriForFile(this, "$packageName.provider", file)
+        FileProvider.getUriForFile(CommonContext, "${CommonContext.packageName}.provider", file)
     } else {
         Uri.fromFile(file)
     }
@@ -125,9 +127,11 @@ fun Context.shareSystem(filePath: String, type: String = "text") {
     }
     shareIntent.type = "$fileType/*"
     shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+    shareIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
 //切记需要使用Intent.createChooser，否则会出现别样的应用选择框
     shareIntent = Intent.createChooser(shareIntent, file.name)
-    startActivity(shareIntent)
+
+    CommonContext.startActivity(shareIntent)
 }
 
 /**
@@ -147,11 +151,11 @@ fun Activity.selectFile() {
  * 这个方法如果不好使,就用下面的方法
  * <code>{@link #refreshGallery}</code>.
  */
-fun Context.refreshFile(filePath: String, action: () -> Unit) {
+fun refreshFile(filePath: String, action: () -> Unit) {
     val file = File(filePath)
     val mtm = MimeTypeMap.getSingleton()
     MediaScannerConnection.scanFile(
-        this,
+        CommonContext,
         arrayOf(file.toString()),
         arrayOf(
             mtm.getMimeTypeFromExtension(
@@ -165,10 +169,10 @@ fun Context.refreshFile(filePath: String, action: () -> Unit) {
  * 通知系统刷新媒体库
  * @param filePath 路径
  */
-fun Context.refreshGallery(filePath: String) {
+fun refreshGallery(filePath: String) {
     val localUri = Uri.fromFile(File(filePath))
     val localIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, localUri)
-    sendBroadcast(localIntent)
+    CommonContext.sendBroadcast(localIntent)
 }
 
 
@@ -176,7 +180,7 @@ fun Context.refreshGallery(filePath: String) {
  * 改变当前app亮度
  *
  */
-fun Activity.changeAppBrightness(brightness: Float) {
+fun Activity.changeBrightness(brightness: Float) {
     val window = window
     val lp = window.attributes
     lp.screenBrightness = brightness
@@ -186,11 +190,11 @@ fun Activity.changeAppBrightness(brightness: Float) {
 /**
  * 获取当前系统亮度
  */
-fun Context.getSystemBrightness(context: Context): Int {
+fun getBrightness(): Int {
     var systemBrightness = 0
     try {
         systemBrightness =
-            Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS)
+            Settings.System.getInt(CommonContext.contentResolver, Settings.System.SCREEN_BRIGHTNESS)
     } catch (e: Settings.SettingNotFoundException) {
     }
     return systemBrightness
@@ -201,13 +205,13 @@ fun Context.getSystemBrightness(context: Context): Int {
  *
  * @return 以M,G为单位的容量
  */
-fun Context.getMemorySize(): String {
+fun getMemorySize(): String {
     val file = Environment.getDataDirectory()
     val statFs = StatFs(file.path)
     val blockSizeLong = statFs.blockSizeLong
     val blockCountLong = statFs.blockCountLong
     val size = blockCountLong * blockSizeLong
-    return Formatter.formatFileSize(this, size)
+    return Formatter.formatFileSize(CommonContext, size)
 }
 
 
@@ -216,10 +220,45 @@ fun Context.getMemorySize(): String {
  *
  * @return 以M,G为单位的容量
  */
-fun Context.getAvailableMemorySize(): String {
+fun getAvailableMemorySize(): String {
     val file = Environment.getDataDirectory()
     val statFs = StatFs(file.path)
     val availableBlocksLong = statFs.availableBlocksLong
     val blockSizeLong = statFs.blockSizeLong
-    return Formatter.formatFileSize(this, availableBlocksLong * blockSizeLong)
+    return Formatter.formatFileSize(CommonContext, availableBlocksLong * blockSizeLong)
+}
+
+
+/**
+ * 获取当前电池是否充电
+ */
+fun isCharging(): Boolean {
+    val batteryBroadcast =
+        CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+    return batteryBroadcast.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) != 0
+}
+
+/**
+ * @return 2（BatteryManager.BATTERY_STATUS_CHARGING） 充电中 5（BatteryManager.BATTERY_STATUS_FULL）充电完成
+ */
+fun batterState(): Int {
+    val batteryBroadcast =
+        CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+    return batteryBroadcast.getIntExtra(
+        BatteryManager.EXTRA_STATUS,
+        BatteryManager.BATTERY_STATUS_UNKNOWN
+    )
+}
+
+/**
+ * 获取手机当前电量
+ */
+fun getCurrentBattery(): Int {
+    val batteryManager = CommonContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+   return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+    } else {
+        val intent = CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) * 100 / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+    }
 }

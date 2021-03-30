@@ -137,6 +137,7 @@ fun px2dip(pxValue: Float): Int {
 
 /**
  * 获取屏幕宽高
+ * 如果有切换横竖屏的动作需要调用 screenWidth() 和 getScreenRealHeight() 方法
  */
 val screenWidth by lazy {
     screenWidth()
