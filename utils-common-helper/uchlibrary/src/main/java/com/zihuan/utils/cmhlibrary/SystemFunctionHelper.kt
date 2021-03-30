@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.media.AudioFocusRequest
+import android.media.AudioManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.BatteryManager
@@ -200,6 +202,63 @@ fun getBrightness(): Int {
     return systemBrightness
 }
 
+private var mAudioManager: AudioManager? = null
+    get() {
+        if (field == null) {
+            initAudioManager()
+        }
+        return field
+    }
+
+/**
+ * 初始化音频管理器
+ */
+private fun initAudioManager() {
+    mAudioManager = CommonContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    mAudioManager?.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//            mAudioManager?.requestAudioFocus(AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).build())
+//        }
+}
+
+/**
+ * 获取音量值
+ *
+ * @return 音量值
+ */
+fun getVolume() = mAudioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) ?: 0
+
+/**
+ * 获取最大音量
+ *
+ * @return 音量值
+ */
+fun getMaxVolume() = mAudioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 0
+
+/**
+ * 设置音量
+ *
+ * @param volume 音量值
+ */
+fun setVolume(volume: Int) {
+    mAudioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+}
+
+/**
+ * 释放音频焦点
+ */
+fun releaseAudioManager() {
+    //放弃音频焦点。使以前的焦点所有者(如果有的话)接收焦点。
+    mAudioManager?.abandonAudioFocus(null)
+//    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//        mAudioManager?.abandonAudioFocusRequest(
+//            AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).build()
+//        )
+//    }
+    //置空
+    mAudioManager = null
+}
+
 /**
  * 获取已用存储空间
  *
@@ -255,10 +314,14 @@ fun batterState(): Int {
  */
 fun getCurrentBattery(): Int {
     val batteryManager = CommonContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
-   return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     } else {
-        val intent = CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) * 100 / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+        val intent =
+            CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        intent.getIntExtra(
+            BatteryManager.EXTRA_LEVEL,
+            -1
+        ) * 100 / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
     }
 }
