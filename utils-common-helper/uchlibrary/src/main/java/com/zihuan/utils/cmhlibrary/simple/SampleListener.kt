@@ -57,40 +57,33 @@ open class TextWatcherSample : TextWatcher {
     override fun afterTextChanged(s: Editable) {}
 }
 
-fun EditText.beforeTextChanged(action: (String) -> Unit) {
-    addTextChangedListener(object : TextWatcherSample() {
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            action(s.toString())
+fun EditText.textChangeListener(before: (String) -> Unit={},onText: (String) -> Unit={},after: (String) -> Unit={}) {
+    addTextChangedListener(object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            before(s.toString())
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            onText(s.toString())
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+            after(s.toString())
         }
     })
+}
+
+fun EditText.beforeTextChanged(action: (String) -> Unit) {
+    textChangeListener(before = action)
 }
 
 fun EditText.onTextChanged(action: (String) -> Unit) {
-    addTextChangedListener(object : TextWatcherSample() {
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            action(s.toString())
-        }
-    })
+    textChangeListener(onText = action)
 }
 
 fun EditText.afterTextChanged(action: (String) -> Unit) {
-    addTextChangedListener(object : TextWatcherSample() {
-        override fun afterTextChanged(s: Editable) {
-            action(s.toString())
-        }
-    })
+    textChangeListener(after = action)
 }
-
-fun Animator.animStart(action: (animation: Animator) -> Unit): Animator {
-    addListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationStart(animation: Animator) {
-            super.onAnimationStart(animation)
-            action(animation)
-        }
-    })
-    return this
-}
-
 
 /**
  * 动画监听
@@ -102,37 +95,10 @@ fun ValueAnimator.animUpdate(action: (ValueAnimator) -> Unit): ValueAnimator {
     return this
 }
 
-fun Animator.animEnd(action: (animation: Animator) -> Unit): Animator {
-    addListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationEnd(animation: Animator) {
-            super.onAnimationEnd(animation)
-            action(animation)
-        }
-    })
-    return this
-}
-
-fun ViewPropertyAnimator.animStart(action: (animation: Animator) -> Unit) {
-    setListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationStart(animation: Animator) {
-            super.onAnimationStart(animation)
-            action(animation)
-        }
-    })
-}
 
 fun ViewPropertyAnimator.animUpdate(action: (ValueAnimator) -> Unit) {
     setUpdateListener {
         action(it)
     }
-}
-
-fun ViewPropertyAnimator.animEnd(action: (animation: Animator) -> Unit) {
-    setListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationEnd(animation: Animator) {
-            super.onAnimationEnd(animation)
-            action(animation)
-        }
-    })
 }
 
