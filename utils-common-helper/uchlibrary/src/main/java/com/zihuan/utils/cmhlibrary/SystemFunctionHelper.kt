@@ -103,6 +103,8 @@ fun getPhotoAlbum(): List<Int> {
 fun shareSystem(filePath: String, type: String = "text") {
     val file = File(filePath)
     var shareIntent = Intent()
+    //切记需要使用Intent.createChooser，否则会出现别样的应用选择框
+    shareIntent = Intent.createChooser(shareIntent, file.name)
     // 判断版本大于等于7.0
     val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         // "项目包名.fileprovider"即是在清单文件中配置的authorities
@@ -130,8 +132,6 @@ fun shareSystem(filePath: String, type: String = "text") {
     shareIntent.type = "$fileType/*"
     shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
     shareIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
-//切记需要使用Intent.createChooser，否则会出现别样的应用选择框
-    shareIntent = Intent.createChooser(shareIntent, file.name)
 
     CommonContext.startActivity(shareIntent)
 }
