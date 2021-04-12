@@ -83,6 +83,15 @@ fun clearPreference() {
     prefs.edit().clear().commit()
 }
 
+/**
+ * 删除单条数据
+ */
+fun removePreference(vararg key: String) {
+    key.forEach {
+        prefs.edit().remove(it).commit()
+    }
+}
+
 //    存储集合
 fun putHashMap(key: String, map: HashMap<String, Int>): Boolean {
     val editor = prefs.edit()

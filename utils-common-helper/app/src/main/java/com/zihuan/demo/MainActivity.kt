@@ -34,7 +34,7 @@ class MainActivity : FragmentActivity() {
         Log.e("输出name", "getCommonPreference =$name")
         var name1 by PreferenceProxy("name", "")
         Log.e("输出name1", "PreferenceProxy =$name1")
-        val mo = 123456
+        val mo = "123456"
         val mo1 = 123456L
         val mo2 = 123456.2
         mo1.savePreference("123")
@@ -54,8 +54,11 @@ class MainActivity : FragmentActivity() {
             llMain.toPng(path, "${System.currentTimeMillis()}.png")
             showToast("截图成功")
         }
-        var mobile = findPreference("mobile", 0)
-//        Log.e("输出mobile", "getCommonPreference =$mobile")
+        var mobile = findPreference("mobile", "")
+        Log.e("输出mobile", "getCommonPreference =$mobile")
+        removePreference("mobile")
+        var mobile2 = findPreference("mobile", "")
+        Log.e("删除后输出mobile", "getCommonPreference =$mobile2")
 //        var list = ArrayList<String>()
 //        (0..100).forEach {
 //            list.add("$it")
