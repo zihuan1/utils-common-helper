@@ -41,7 +41,7 @@ fun Boolean.savePreference(key: String) {
 
 /**
  * 快速的获取值
- * var value=getCommonPreference()
+ * var value=findPreference()
  */
 fun <T : Any> findPreference(key: String, defValue: T): T {
     return getPreference(key, defValue)
