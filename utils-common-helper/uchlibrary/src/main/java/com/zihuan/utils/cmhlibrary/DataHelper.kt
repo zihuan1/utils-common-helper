@@ -5,13 +5,14 @@ import java.util.regex.Pattern
 
 /**
  * 当前类包含了常用的基本数据类型操作
+ * 
  */
 
 
 /**
  * 字符串非空扩展
  */
-inline fun String.isNotEmptyExtend(action: String.() -> Unit) = apply {
+inline fun String.isNotEmpty(action: String.() -> Unit) = apply {
     if (!isNullOrBlank() && !isNullOrEmpty()) {
         action()
     }
@@ -20,7 +21,7 @@ inline fun String.isNotEmptyExtend(action: String.() -> Unit) = apply {
 /**
  * 字符串为空扩展
  */
-inline fun String.isEmptyExtend(action: String.() -> Unit) = apply {
+inline fun String.isEmpty(action: String.() -> Unit) = apply {
     if (isNullOrEmpty() || isBlank()) {
         action()
     }
@@ -29,59 +30,92 @@ inline fun String.isEmptyExtend(action: String.() -> Unit) = apply {
 /**
  * true 扩展
  */
-inline fun Boolean.trueExtend(action: () -> Unit) = apply {
-    if (this) {
-        action()
-    }
+inline fun Boolean.isTrue(action: () -> Unit) = apply {
+    if (this) action()
 }
 
 /**
  * false 扩展
  */
-inline fun Boolean.falseExtend(action: () -> Unit) = apply {
-    if (!this) {
-        action()
-    }
+inline fun Boolean.isFalse(action: () -> Unit) = apply {
+    if (!this) action()
 }
 
 /**
  * 是否是T对象,如果是的话返回自身,否则返回空
  */
-inline fun <reified T> Any.instanceof(): T? {
-    return if (this is T) {
-        this
-    } else null
-}
+inline fun <reified T> Any.instanceOf() = if (this is T) this else null
+
+inline fun <reified T> Any.instanceOf(any: T) = this is T
 
 /**
  * 三元运算
  */
-inline fun <T> Boolean.threeUnary(any: T, any2: T): T {
-    return if (this) {
-        any
-    } else any2
-}
+inline fun <T> Boolean.unary(any: T, any2: T) = if (this) any else any2
 
-inline fun <T> threeUnary(any: T, any2: T, action: () -> Boolean): T {
-    return if (action()) {
-        any
-    } else any2
-}
+inline fun <T> unary(any: T, any2: T, action: () -> Boolean) = action().unary(any, any2)
 
 /**
  * 当前数是否大于九
  */
-fun Int.lessThanNine() = this <= 9
-
-fun Long.lessThanNine() = this <= 9
-
-fun Int.isEmpty() = this <= 0
-fun Int.isNotEmpty() = this > 0
-
-fun Long.isEmpty() = this <= 0
-fun Long.isNotEmpty() = this > 0
+val Int.withNine: Boolean
+    get() = toLong().withNine
+val Long.withNine: Boolean
+    get() = this > 9
 
 
+val Int.withZero: Boolean
+    get() = toLong().withZero
+
+val Long.withZero: Boolean
+    get() = this > 0
+
+/**
+ * 如果小于九在前面添0
+ */
+val Int.withNineZero: String
+    get() = toLong().withNineZero
+
+val Long.withNineZero: String
+    get() = if (!withNine) "0$this" else toString()
+
+
+/**
+ * 返回第一个非零的数字
+ */
+fun firstNotZero(vararg args: Int): Int {
+    args.forEach {
+        if (it > 0) return it
+    }
+    return 0
+}
+
+/**
+ * 保留小数
+ */
+fun String.keepDecimal(number: Int = 2) {
+    val num = if (!isNullOrEmpty()) {
+        this
+    } else "0"
+    "%.$number".format(this.toDouble())
+}
+
+/**
+ * 判断当前字符是否为空,如果为空返回0,否则返回自身
+ */
+val String.notEmptyNumber: String
+    get() = if (isNullOrEmpty() || isBlank()) "0" else this
+
+/**
+ * 返回第一个非空的字符
+ * 适用于有多个参数,但不知道哪个参数不为空
+ */
+fun stringDetermineEmpty(vararg args: String): String {
+    args.forEach {
+        if (!it.isNullOrBlank()) return it
+    }
+    return ""
+}
 /**
  * 反转布尔类型的集合
  */
@@ -101,41 +135,37 @@ fun MutableList<Boolean>.forEachReverseIndex(index: Int): MutableList<Boolean> {
 }
 
 //dp转px
-var Int.dp: Int
-    get() = this.toFloat().dp.toInt()
-    set(value) {
-    }
+val Int.dp: Int
+    get() = toFloat().dp.toInt()
 
-var Float.dp: Float
+val Float.dp: Float
     get() = CommonContext.resources.displayMetrics.density * this
-    set(value) {
-    }
 
 //sp转px
-var Int.spx: Int
-    get() = this.toFloat().spx.toInt()
-    set(value) {}
-var Float.spx: Float
+val Int.spx: Int
+    get() = toFloat().spx.toInt()
+
+val Float.spx: Float
     get() = (CommonContext.resources.displayMetrics.scaledDensity * this)
-    set(value) {}
+
 
 // px转dp
-var Int.px: Int
-    get() = this.toFloat().px.toInt()
-    set(value) {}
+val Int.px: Int
+    get() = toFloat().px.toInt()
 
-var Float.px: Float
+
+val Float.px: Float
     get() = this / CommonContext.resources.displayMetrics.density
-    set(value) {}
+
 
 //px转sp
-var Int.xsp: Int
-    get() = this.toFloat().xsp.toInt()
-    set(value) {}
+val Int.xsp: Int
+    get() = toFloat().xsp.toInt()
 
-var Float.xsp: Float
+
+val Float.xsp: Float
     get() = this / CommonContext.resources.displayMetrics.scaledDensity
-    set(value) {}
+
 
 //private fun <T : Number> T.compare(i: Number): Number {
 //    return when (i) {
@@ -143,48 +173,6 @@ var Float.xsp: Float
 //        else -> i as Long
 //    }
 //}
-
-/**
- * 返回第一个非零的数字
- */
-fun firstNotZero(vararg args: Int): Int {
-    args.forEach {
-        if (it > 0) return it
-    }
-    return 0
-}
-
-/**
- * 保留小数
- */
-fun String.saveDecimal(number: Int = 2) {
-    val num = if (!isNullOrEmpty()) {
-        this
-    } else "0"
-    "%.$number".format(this.toDouble())
-}
-
-/**
- * 如果小于九在前面添0
- */
-fun Int.lessNineAddZero() = if (this.lessThanNine()) "0$this" else this.toString()
-
-/**
- * 返回第一个非空的字符
- * 适用于有多个参数,但不知道哪个参数不为空
- */
-fun stringDetermineEmpty(vararg args: String): String {
-    args.forEach {
-        if (!it.isNullOrBlank()) return it
-    }
-    return ""
-}
-
-
-/**
- * 判断当前字符是否为空,如果为空返回0,否则返回自身
- */
-fun String.getNotEmptyNumber() = if (isNullOrEmpty() || isBlank()) "0" else this
 
 
 /**
@@ -216,10 +204,7 @@ fun transMap2String(map: Map<*, *>): String {
     while (iterator.hasNext()) {
         entry = iterator.next() as java.util.Map.Entry<*, *>
         sb.append(entry.key.toString()).append("=").append(
-            if (null == entry.value)
-                ""
-            else
-                entry.value.toString()
+            if (null == entry.value) "" else entry.value.toString()
         ).append(if (iterator.hasNext()) "&" else "")
     }
     return sb.toString()

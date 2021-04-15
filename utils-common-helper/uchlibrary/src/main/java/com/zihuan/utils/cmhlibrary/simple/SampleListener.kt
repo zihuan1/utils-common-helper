@@ -8,7 +8,6 @@ import android.text.TextWatcher
 import android.view.ViewPropertyAnimator
 import android.widget.EditText
 import androidx.viewpager.widget.ViewPager
-import com.zihuan.utils.cmhlibrary.isNotEmptyExtend
 
 open class SamplePageChangeListener : ViewPager.OnPageChangeListener {
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
@@ -57,7 +56,11 @@ open class TextWatcherSample : TextWatcher {
     override fun afterTextChanged(s: Editable) {}
 }
 
-fun EditText.textChangeListener(before: (String) -> Unit={},onText: (String) -> Unit={},after: (String) -> Unit={}) {
+fun EditText.textChangeListener(
+    before: (String) -> Unit = {},
+    onText: (String) -> Unit = {},
+    after: (String) -> Unit = {}
+) {
     addTextChangedListener(object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             before(s.toString())
