@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 
 /**
  * 当前类包含了常用的基本数据类型操作
- * 
+ *
  */
 
 
