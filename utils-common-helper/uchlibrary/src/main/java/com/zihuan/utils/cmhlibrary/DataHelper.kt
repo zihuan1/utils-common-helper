@@ -1,5 +1,6 @@
 package com.zihuan.utils.cmhlibrary
 
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 
@@ -116,6 +117,7 @@ fun stringDetermineEmpty(vararg args: String): String {
     }
     return ""
 }
+
 /**
  * 反转布尔类型的集合
  */
@@ -208,4 +210,35 @@ fun transMap2String(map: Map<*, *>): String {
         ).append(if (iterator.hasNext()) "&" else "")
     }
     return sb.toString()
+}
+
+//是否为中文
+val CharSequence.isChinese: Boolean
+    get() = matcher(this, "[\u4e00-\u9fa5]+")
+
+//是否为英文
+val CharSequence.isEnglish: Boolean
+    //    get() = matches(Regex("\\p{L}"))
+    get() = matcher(this, "[a-zA-Z]+")
+val String.isEnglish: Boolean
+    get() = toCharArray().let {
+        var english = true
+        it.forEach {
+            if (!it.toString().matches(Regex("\\p{L}"))) {
+                english = false
+                return@forEach
+            }
+        }
+        english
+    }
+
+//是否为标点符号
+val CharSequence.isSymbol: Boolean
+    get() = matches(Regex("\\p{P}"))
+
+fun matcher(text: CharSequence, regular: String): Boolean {
+    val matcher: Matcher
+    val pattern: Pattern = Pattern.compile(regular)
+    matcher = pattern.matcher(text)
+    return matcher.matches()
 }

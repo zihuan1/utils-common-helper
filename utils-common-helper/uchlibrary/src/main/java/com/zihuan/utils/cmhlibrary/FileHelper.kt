@@ -1,6 +1,5 @@
 package com.zihuan.utils.cmhlibrary
 
-import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
@@ -60,7 +59,7 @@ fun getFilesPath(@NotNull path: String, @NotNull files: ArrayList<File>): List<F
             } else {
                 files.add(it)
             }
-            Logger("文件夹" + it.absoluteFile)
+            CommonLogger("文件夹" + it.absoluteFile)
         }
     }
     return files
@@ -80,7 +79,7 @@ fun stringMerge(path: String): String {
     val file = File(outPath)
     if (!file.exists()) {
         file.mkdir()
-        Logger("创建文件夹")
+        CommonLogger("创建文件夹")
     }
     val name = path.split("/").let {
         it[it.lastIndex]
@@ -88,7 +87,7 @@ fun stringMerge(path: String): String {
     val file2 = File(file.absolutePath + "/$name${System.currentTimeMillis()}.txt")
     if (!file2.exists()) {
         file2.createNewFile()
-        Logger("创建文件")
+        CommonLogger("创建文件")
     }
     var outOs = FileOutputStream(file2)
     outOs.use {
@@ -200,7 +199,7 @@ fun isExistSDCard(): Boolean {
 fun delete(delFile: String): Boolean {
     val file = File(delFile)
     return if (!file.exists()) {
-        Logger("删除文件失败:" + delFile + "不存在！")
+        CommonLogger("删除文件失败:" + delFile + "不存在！")
         false
     } else {
         if (file.isFile)
@@ -221,14 +220,14 @@ fun deleteSingleFile(filePathName: String): Boolean {
     // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
     return if (file.exists() && file.isFile) {
         if (file.delete()) {
-            Logger("Copy_Delete.deleteSingleFile: 删除单个文件" + filePathName + "成功！")
+            CommonLogger("Copy_Delete.deleteSingleFile: 删除单个文件" + filePathName + "成功！")
             true
         } else {
-            Logger("删除单个文件" + filePathName + "失败！")
+            CommonLogger("删除单个文件" + filePathName + "失败！")
             false
         }
     } else {
-        Logger("删除单个文件失败：" + filePathName + "不存在！")
+        CommonLogger("删除单个文件失败：" + filePathName + "不存在！")
         false
     }
 }
@@ -247,7 +246,7 @@ fun deleteDirectory(filePath: String): Boolean {
     val dirFile = File(filePath)
     // 如果dir对应的文件不存在，或者不是一个目录，则退出
     if (!dirFile.exists() || !dirFile.isDirectory) {
-        Logger("删除目录失败：" + filePath + "不存在！")
+        CommonLogger("删除目录失败：" + filePath + "不存在！")
         return false
     }
     var flag = true
@@ -269,15 +268,15 @@ fun deleteDirectory(filePath: String): Boolean {
         }// 删除子目录
     }
     if (!flag) {
-        Logger("删除目录失败！")
+        CommonLogger("删除目录失败！")
         return false
     }
     // 删除当前目录
     return if (dirFile.delete()) {
-        Logger("Copy_Delete.deleteDirectory: 删除目录" + filePath + "成功！")
+        CommonLogger("Copy_Delete.deleteDirectory: 删除目录" + filePath + "成功！")
         true
     } else {
-        Logger("删除目录：" + filePath + "失败！")
+        CommonLogger("删除目录：" + filePath + "失败！")
         false
     }
 }
@@ -551,7 +550,7 @@ fun reNameFile(file: File, fileName: String): String? {
 fun Context.getSecondaryStoragePath(): String {
     var storage = getExternalFilesDirs(this, Environment.MEDIA_MOUNTED)
     storage.forEach {
-        Logger(it.name + " " + it.path + " " + it.absolutePath + " " + it.absoluteFile)
+        CommonLogger(it.name + " " + it.path + " " + it.absolutePath + " " + it.absoluteFile)
     }
     return ""
 }

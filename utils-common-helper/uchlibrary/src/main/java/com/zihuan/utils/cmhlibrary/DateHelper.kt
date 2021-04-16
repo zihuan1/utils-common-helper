@@ -30,7 +30,7 @@ fun dateToStamp(time: String, type: String): String {
         val ts = date.time / 1000
         time = ts.toString()
     } catch (e: ParseException) {
-        Logger("时间转换为时间戳异常 $e")
+        CommonLogger("时间转换为时间戳异常 $e")
     }
     return time
 }
@@ -76,7 +76,7 @@ fun stampFormDate(argTime: String?): String? {
     val iMinute = 60
     val iHour = 60 * iMinute
     val iDay = 24 * iHour
-    Logger("second$interval")
+    CommonLogger("second$interval")
     strTime = when {
         interval.toInt() in 1..59 -> "" + interval.toInt() + "秒前"
         (interval / iMinute).toInt() in 1..59 -> "" + (interval / iMinute).toInt() + "分钟前"
@@ -163,7 +163,7 @@ fun getAfterDay(time: String, type: String, day: Int): String {
     calendar.add(Calendar.DAY_OF_MONTH, +day)
     date = calendar.time
     val str = formatter.format(date)
-    Logger("向后" + day + "天" + "" + str)
+    CommonLogger("向后" + day + "天" + "" + str)
     return str + ""
 }
 
@@ -216,7 +216,7 @@ fun getTopWeek(c: Int): List<*> {
     cal.add(Calendar.WEEK_OF_MONTH, c)
     for (i in 0..6) {
         cal.add(Calendar.DATE, -1 * cal.get(Calendar.DAY_OF_WEEK) + 2 + i)
-        Logger("上一周" + sf.format(cal.time))
+        CommonLogger("上一周" + sf.format(cal.time))
         topWeek.add(sf.format(cal.time) + "")
     }
     return topWeek
@@ -235,7 +235,7 @@ fun getApartDay(a: String, b: String): Int {
         d1 = sdf.parse(day1)
         d2 = sdf.parse(day2)
     } catch (e: ParseException) {
-        Logger("异常$e")
+        CommonLogger("异常$e")
     }
     val cal = Calendar.getInstance()
     cal.time = d1
@@ -267,8 +267,8 @@ fun timeStampDiffHMS(time1: String, time2: String): String {
 
         val miao =
             (diff - days * (1000 * 60 * 60 * 24) - hours * (1000 * 60 * 60) - minutes * (1000 * 60)) / 1000
-        Logger("" + days + "天" + hours + "小时" + minutes + "分" + miao + "秒")
-        Logger("diff $diff")
+        CommonLogger("" + days + "天" + hours + "小时" + minutes + "分" + miao + "秒")
+        CommonLogger("diff $diff")
         return if (hours == 0L) {
             (+minutes).toString() + ":" + miao
         } else {
@@ -296,12 +296,12 @@ fun timeStampDiffSecond(time1: String, time2: String): String {
 
         //            long year = diff / (1000 * 60 * 60 * 24 *365);
 
-        Logger("" + diff)
+        CommonLogger("" + diff)
 
         return diff.toString() + ""
 
     } catch (e: Exception) {
-        Logger("Exception$e")
+        CommonLogger("Exception$e")
     }
     return "0"
 }
@@ -353,7 +353,7 @@ fun formatTime(milliseconds: Long): String {
 
 var DateUtilsDebug = false
 
-internal fun Logger(logger: String) {
+internal fun CommonLogger(logger: String) {
     if (DateUtilsDebug) {
         Log.e("DateUtil", logger)
     }

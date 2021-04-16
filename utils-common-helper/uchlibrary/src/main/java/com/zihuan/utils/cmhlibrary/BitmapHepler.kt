@@ -43,7 +43,7 @@ fun Bitmap.save(path: String, fileName: String, quality: Int = 100, fScale: Floa
         out.close()
         newBitmap.recycle()
         newBitmap = null
-        Logger("保存成功" + pFilePath.absolutePath)
+        CommonLogger("保存成功" + pFilePath.absolutePath)
         //            检测图片是否被旋转
         val arg = readPictureDegree(url)
         if (arg == 0) {
@@ -53,7 +53,7 @@ fun Bitmap.save(path: String, fileName: String, quality: Int = 100, fScale: Floa
             rotatingImageView(arg, this).save(path, fileName, quality, fScale)
         }
     } catch (e: Exception) {
-        Logger("保存失败$e")
+        CommonLogger("保存失败$e")
         //            e.printStackTrace();
     }
     return url
