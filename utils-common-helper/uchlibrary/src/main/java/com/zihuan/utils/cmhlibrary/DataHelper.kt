@@ -220,17 +220,6 @@ val CharSequence.isChinese: Boolean
 val CharSequence.isEnglish: Boolean
     //    get() = matches(Regex("\\p{L}"))
     get() = matcher(this, "[a-zA-Z]+")
-val String.isEnglish: Boolean
-    get() = toCharArray().let {
-        var english = true
-        it.forEach {
-            if (!it.toString().matches(Regex("\\p{L}"))) {
-                english = false
-                return@forEach
-            }
-        }
-        english
-    }
 
 //是否为标点符号
 val CharSequence.isSymbol: Boolean
