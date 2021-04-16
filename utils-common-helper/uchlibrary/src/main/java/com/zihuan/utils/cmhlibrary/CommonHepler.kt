@@ -88,7 +88,7 @@ fun EditText.cursorMoveToPosition(position: Int): EditText {
  */
 fun checkNetworkConnected(): Boolean {
     val mConnectivityManager = CommonContext
-        .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val mNetworkInfo = mConnectivityManager.activeNetworkInfo
     if (mNetworkInfo != null) {
         return mNetworkInfo.isAvailable
@@ -103,7 +103,7 @@ fun checkNetworkConnected(): Boolean {
  */
 fun checkGPSIsOpen(): Boolean {
     val locationManager =
-        CommonContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            CommonContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 }
 
@@ -224,16 +224,16 @@ private var mToast: Toast? = null
  *
  * @param argText
  */
-fun showToast(argText: String) {
+fun toast(argText: String) {
     val mainHandler = Handler(CommonContext.mainLooper)
     val myRunnable = Runnable {
         if (mToast != null) {
-            mToast!!.cancel()
+            mToast?.cancel()
             mToast = null
         }
         mToast = Toast.makeText(CommonContext, argText, Toast.LENGTH_SHORT)
-        mToast!!.setGravity(Gravity.CENTER, 0, 0)
-        mToast!!.show()
+        mToast?.setGravity(Gravity.CENTER, 0, 0)
+        mToast?.show()
     }
     mainHandler.post(myRunnable)
 }
@@ -253,6 +253,12 @@ fun CommonContext.getVersionCode(): Long {
         p1.versionCode.toLong()
     }
 }
+
+/**
+ * 缓存根路径
+ */
+val rootPath: String
+    get() = Environment.getExternalStorageDirectory().absolutePath
 
 /**
  * 获取当前应用缓存路径.
@@ -299,8 +305,8 @@ inline fun <reified T : Activity> Context.startActivityPro(vararg params: Pair<S
 }
 
 inline fun <reified T : Activity> Context.startActivityPro(
-    vararg params: Pair<String, Any>,
-    action: () -> Boolean
+        vararg params: Pair<String, Any>,
+        action: () -> Boolean
 ) {
     if (action())
         startActivity<T>(*params)

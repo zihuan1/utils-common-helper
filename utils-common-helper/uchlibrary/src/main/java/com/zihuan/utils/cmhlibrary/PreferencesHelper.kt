@@ -98,7 +98,7 @@ fun putHashMap(key: String, map: HashMap<String, Int>): Boolean {
     try {
         editor.putString(key, sceneList2String(map))
     } catch (e: IOException) {
-        showToast("存储Map错误$e")
+        toast("存储Map错误$e")
     }
 
     return editor.commit()

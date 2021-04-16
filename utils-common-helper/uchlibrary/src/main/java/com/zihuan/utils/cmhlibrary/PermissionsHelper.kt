@@ -1,5 +1,6 @@
 package com.zihuan.utils.cmhlibrary
 
+import android.Manifest
 import android.content.Context
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -13,26 +14,30 @@ import com.github.dfqin.grantor.PermissionsUtil
  * @date 2019/11/11 18:23
  */
 
-
-inline fun Fragment.requestEasyPermission(vararg permissions: String, crossinline permissionListener: (pass: Boolean) -> Unit) {
-    requireContext().requestEasyPermission(*permissions, permissionListener = permissionListener)
+/**
+ * 请求存储权限
+ */
+inline fun storagePermission(crossinline action: (pass: Boolean) -> Unit) {
+    requestEasyPermission(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,action=action)
 }
 
-inline fun View.requestEasyPermission(vararg permissions: String, crossinline permissionListener: (pass: Boolean) -> Unit) {
-    context.requestEasyPermission(*permissions, permissionListener = permissionListener)
+/**
+ * 相机权限
+ */
+inline fun cameraPermission(crossinline action: (pass: Boolean) -> Unit) {
+    requestEasyPermission(Manifest.permission.CAMERA,action=action)
 }
 
-inline fun Context.requestEasyPermission(vararg permissions: String, crossinline permissionListener: (pass: Boolean) -> Unit) {
+inline fun requestEasyPermission(vararg permissions: String, crossinline action: (pass: Boolean) -> Unit) {
     var permission = object : PermissionListener {
         override fun permissionGranted(permission: Array<out String>) {
-//            toast("授权通过")
-            permissionListener(true)
+            action(true)
         }
 
         override fun permissionDenied(permission: Array<out String>) {
-            permissionListener(false)
+            action(false)
         }
 
     }
-    PermissionsUtil.requestPermission(this, permission, * permissions)
+    PermissionsUtil.requestPermission(CommonContext, permission, * permissions)
 }

@@ -52,7 +52,7 @@ class MainActivity : FragmentActivity() {
         Log.e("测试时间", "测试" + formatTime(31000))
         ivScreenshots.setOnClickListener {
             llMain.toPng(path, "${System.currentTimeMillis()}.png")
-            showToast("截图成功")
+            toast("截图成功")
         }
         var mobile = findPreference("mobile", "")
         Log.e("输出mobile", "getCommonPreference =$mobile")

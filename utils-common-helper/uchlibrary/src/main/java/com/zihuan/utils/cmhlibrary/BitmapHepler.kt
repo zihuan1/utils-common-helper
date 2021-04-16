@@ -18,15 +18,10 @@ import kotlin.math.min
  * 保存图片到SD卡
  *
  * @param fileName
- * @param quality     保存的质量（1-100）
+ * @param quality     保存的质量（0-100）
  * @param fScale      压缩比率 1为原图
  */
-fun Bitmap.saveBitmapToSD(
-    path: String,
-    fileName: String,
-    quality: Int,
-    fScale: Float = 1f
-): String {
+fun Bitmap.save(path: String, fileName: String, quality: Int = 100, fScale: Float = 1f): String {
     val pFileDir = File(path)
     var url = ""
     val pFilePath = File(pFileDir, fileName)
@@ -41,7 +36,7 @@ fun Bitmap.saveBitmapToSD(
         } else {
             compressImage(this, fScale)
         }
-        newBitmap!!.compress(Bitmap.CompressFormat.PNG, quality, stream)
+        newBitmap.compress(Bitmap.CompressFormat.PNG, quality, stream)
         url = pFilePath.absolutePath
         stream.flush()//输出
         stream.close()//关闭
@@ -55,7 +50,7 @@ fun Bitmap.saveBitmapToSD(
             return url
         } else {
             //                修复旋转重新保存
-            rotatingImageView(arg, this).saveBitmapToSD(path, fileName, quality, fScale)
+            rotatingImageView(arg, this).save(path, fileName, quality, fScale)
         }
     } catch (e: Exception) {
         Logger("保存失败$e")
@@ -101,8 +96,8 @@ fun drawableToBitmap(vectorDrawableId: Int): Bitmap {
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
         val vectorDrawable: Drawable = CommonContext.getDrawable(vectorDrawableId)
         bitmap = Bitmap.createBitmap(
-            vectorDrawable.intrinsicWidth,
-            vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888
+                vectorDrawable.intrinsicWidth,
+                vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888
         )
         val canvas = Canvas(bitmap)
         vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
@@ -124,8 +119,8 @@ fun readPictureDegree(path: String): Int {
     try {
         val exifInterface = ExifInterface(path)
         when (exifInterface.getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_NORMAL
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
         )) {
             ExifInterface.ORIENTATION_ROTATE_90 -> degree = 90
             ExifInterface.ORIENTATION_ROTATE_180 -> degree = 180
@@ -188,47 +183,21 @@ fun cropImage(bitmap: Bitmap): Bitmap {
 /**
  * 修改图片大小
  *
- * @param source 原图
  * @param width  需要的宽
  * @param height 需要的高
- * @return
  */
-fun extractThumbnail(source: Bitmap, width: Int, height: Int): Bitmap? {
-    return extractThumbnail(source, width, height, 0x0)
-}
-
-/**
- * Creates a centered bitmap of the desired size.
- *
- * @param source  original bitmap source
- * @param width   targeted width
- * @param height  targeted height
- * @param options options used during thumbnail extraction
- */
-fun extractThumbnail(
-    source: Bitmap?, width: Int, height: Int, options: Int
-): Bitmap? {
-    if (source == null) {
-        return null
-    }
+fun Bitmap.modifySize(width: Int, height: Int): Bitmap? {
     val matrix = Matrix()
     matrix.setScale(1f, 1f)
-    return transform(
-        matrix, source, width, height,
-        1 or options
-    )
+    return transform(matrix, this, width, height, 1 or 0x0)
 }
+
 
 /**
  * Transform source Bitmap to targeted width and height.
  */
 private fun transform(
-    scaler: Matrix?,
-    source: Bitmap,
-    targetWidth: Int,
-    targetHeight: Int,
-    options: Int
-): Bitmap {
+        scaler: Matrix?, source: Bitmap, targetWidth: Int, targetHeight: Int, options: Int): Bitmap {
     var scaler = scaler
     val scaleUp = options and 1 != 0
     val recycle = options and 1 != 0
@@ -236,26 +205,26 @@ private fun transform(
     val deltaY = source.height - targetHeight
     if (!scaleUp && (deltaX < 0 || deltaY < 0)) {
         val b2 = Bitmap.createBitmap(
-            targetWidth, targetHeight,
-            Bitmap.Config.ARGB_8888
+                targetWidth, targetHeight,
+                Bitmap.Config.ARGB_8888
         )
         val c = Canvas(b2)
 
         val deltaXHalf = max(0, deltaX / 2)
         val deltaYHalf = max(0, deltaY / 2)
         val src = Rect(
-            deltaXHalf,
-            deltaYHalf,
-            deltaXHalf + min(targetWidth, source.width),
-            deltaYHalf + min(targetHeight, source.height)
+                deltaXHalf,
+                deltaYHalf,
+                deltaXHalf + min(targetWidth, source.width),
+                deltaYHalf + min(targetHeight, source.height)
         )
         val dstX = (targetWidth - src.width()) / 2
         val dstY = (targetHeight - src.height()) / 2
         val dst = Rect(
-            dstX,
-            dstY,
-            targetWidth - dstX,
-            targetHeight - dstY
+                dstX,
+                dstY,
+                targetWidth - dstX,
+                targetHeight - dstY
         )
         c.drawBitmap(source, src, dst, null)
         if (recycle) {
@@ -288,8 +257,8 @@ private fun transform(
 
     val b1: Bitmap
     b1 = if (scaler != null) Bitmap.createBitmap(
-        source, 0, 0,
-        source.width, source.height, scaler, true
+            source, 0, 0,
+            source.width, source.height, scaler, true
     ) else {
         source
     }
@@ -357,8 +326,8 @@ fun blur(`in`: IntArray, out: IntArray, width: Int, height: Int, radius: Float) 
         var tb = 0
         for (i in -r..r) {
             val rgb = `in`[inIndex + clamp(
-                i, 0,
-                width - 1
+                    i, 0,
+                    width - 1
             )]
             ta += rgb shr 24 and 0xff
             tr += rgb shr 16 and 0xff
@@ -414,6 +383,6 @@ fun View.toBitmap(): Bitmap {
  * View保存成PNG图片
  */
 fun View.toPng(path: String, name: String) {
-    toBitmap().saveBitmapToSD(path, name, 100, 1f)
+    toBitmap().save(path, name, 100, 1f)
 }
 
