@@ -19,9 +19,9 @@ const val TIME_YYYY_MM_dd = "yyyy-MM-dd"
  * 时间转换为时间戳
  * @param time 待转换的时间
  * @param type 格式
- * @param timeZone 时区
+ * @param timeZone 时区，默认是北京时区
  */
-fun dateToStamp(time: String, type: String, timeZone: String = "GMT+8:00"): String {
+fun dateToStamp(time: String, type: String, timeZone: String = COMM_DATE_TIME_ZONE): String {
     var time = time
     var type = type
     if (TextUtils.isEmpty(type)) {
@@ -45,7 +45,7 @@ fun dateToStamp(time: String, type: String, timeZone: String = "GMT+8:00"): Stri
  * @param type 格式
  * @param timeZone 时区
  */
-fun stampToDate(time: String, type: String, timeZone: String = "GMT+8:00"): String {
+fun stampToDate(time: String, type: String, timeZone: String = COMM_DATE_TIME_ZONE): String {
     var type = type
     if (TextUtils.isEmpty(type)) {
         type = TIME_YYYY_MM_dd

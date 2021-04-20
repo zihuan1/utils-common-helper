@@ -88,7 +88,7 @@ fun EditText.cursorMoveToPosition(position: Int): EditText {
  */
 fun checkNetworkConnected(): Boolean {
     val mConnectivityManager = CommonContext
-            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val mNetworkInfo = mConnectivityManager.activeNetworkInfo
     if (mNetworkInfo != null) {
         return mNetworkInfo.isAvailable
@@ -103,7 +103,7 @@ fun checkNetworkConnected(): Boolean {
  */
 fun checkGPSIsOpen(): Boolean {
     val locationManager =
-            CommonContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        CommonContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 }
 
@@ -305,8 +305,8 @@ inline fun <reified T : Activity> Context.startActivityPro(vararg params: Pair<S
 }
 
 inline fun <reified T : Activity> Context.startActivityPro(
-        vararg params: Pair<String, Any>,
-        action: () -> Boolean
+    vararg params: Pair<String, Any>,
+    action: () -> Boolean
 ) {
     if (action())
         startActivity<T>(*params)
@@ -319,4 +319,6 @@ inline fun <reified T : Activity> Fragment.startActivityPro(vararg params: Pair<
 inline fun <reified T : Activity> View.startActivityPro(vararg params: Pair<String, Any>) {
     context.startActivityPro<T>(*params)
 }
+
+var COMM_DATE_TIME_ZONE = "GMT+8:00"
 
