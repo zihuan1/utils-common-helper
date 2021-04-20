@@ -17,8 +17,11 @@ const val TIME_YYYY_MM_dd = "yyyy-MM-dd"
 
 /**
  * 时间转换为时间戳
+ * @param time 待转换的时间
+ * @param type 格式
+ * @param timeZone 时区
  */
-fun dateToStamp(time: String, type: String): String {
+fun dateToStamp(time: String, type: String, timeZone: String = "GMT+8:00"): String {
     var time = time
     var type = type
     if (TextUtils.isEmpty(type)) {
@@ -28,6 +31,7 @@ fun dateToStamp(time: String, type: String): String {
     try {
         var date = simpleDateFormat.parse(time)
         val ts = date.time / 1000
+        simpleDateFormat.timeZone = TimeZone.getTimeZone(timeZone)
         time = ts.toString()
     } catch (e: ParseException) {
         CommonLogger("时间转换为时间戳异常 $e")
@@ -37,8 +41,11 @@ fun dateToStamp(time: String, type: String): String {
 
 /**
  *  时间戳转换为时间
+ * @param time 待转换的时间戳
+ * @param type 格式
+ * @param timeZone 时区
  */
-fun stampToDate(time: String, type: String): String {
+fun stampToDate(time: String, type: String, timeZone: String = "GMT+8:00"): String {
     var type = type
     if (TextUtils.isEmpty(type)) {
         type = TIME_YYYY_MM_dd
@@ -48,6 +55,7 @@ fun stampToDate(time: String, type: String): String {
     }
     var d = java.lang.Long.parseLong(time)
     val sdf = SimpleDateFormat(type)
+    sdf.timeZone = TimeZone.getTimeZone(timeZone)
     if (time.length == 10) {
         d *= 1000
     }
