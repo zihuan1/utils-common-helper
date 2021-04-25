@@ -238,21 +238,26 @@ fun toast(argText: String) {
     mainHandler.post(myRunnable)
 }
 
-fun CommonContext.getVersionName(): String {
-    val pm = packageManager
-    val p1 = pm.getPackageInfo(packageName, 0)
-    return p1.versionName
-}
-
-fun CommonContext.getVersionCode(): Long {
-    val pm = packageManager
-    val p1 = pm.getPackageInfo(packageName, 0)
-    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-        p1.longVersionCode
-    } else {
-        p1.versionCode.toLong()
+/**
+ * 获取版本号
+ */
+var versionName = ""
+    get() {
+        val pm = CommonContext.packageManager
+        val p1 = pm.getPackageInfo(CommonContext.packageName, 0)
+        return p1.versionName
     }
-}
+
+var versionCode = 0L
+    get() {
+        val pm = CommonContext.packageManager
+        val p1 = pm.getPackageInfo(CommonContext.packageName, 0)
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            p1.longVersionCode
+        } else {
+            p1.versionCode.toLong()
+        }
+    }
 
 /**
  * 缓存根路径
@@ -304,10 +309,7 @@ inline fun <reified T : Activity> Context.startActivityPro(vararg params: Pair<S
     startActivity<T>(*params)
 }
 
-inline fun <reified T : Activity> Context.startActivityPro(
-    vararg params: Pair<String, Any>,
-    action: () -> Boolean
-) {
+inline fun <reified T : Activity> Context.startActivityPro(vararg params: Pair<String, Any>, action: () -> Boolean) {
     if (action())
         startActivity<T>(*params)
 }
