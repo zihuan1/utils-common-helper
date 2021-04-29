@@ -12,8 +12,15 @@ import java.util.*
  */
 
 
-const val TIME_YYYY_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss"
 const val TIME_YYYY_MM_dd = "yyyy-MM-dd"
+const val TIME_YYYY_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss"
+const val TIME_YYYY_MM_dd_HH_mm = "yyyy-MM-dd HH:mm"
+
+
+val String.toStamp10: String
+    get() = dateToStamp(this)
+val String.toStamp13: String
+    get() = (stampToDate(this).toLong() * 1000).toString()
 
 /**
  * 时间转换为时间戳
@@ -21,12 +28,8 @@ const val TIME_YYYY_MM_dd = "yyyy-MM-dd"
  * @param type 格式
  * @param timeZone 时区，默认是北京时区
  */
-fun dateToStamp(time: String, type: String, timeZone: String = COMM_DATE_TIME_ZONE): String {
+fun dateToStamp(time: String, type: String = TIME_YYYY_MM_dd_HH_mm_ss, timeZone: String = COMM_DATE_TIME_ZONE): String {
     var time = time
-    var type = type
-    if (TextUtils.isEmpty(type)) {
-        type = TIME_YYYY_MM_dd_HH_mm_ss
-    }
     val simpleDateFormat = SimpleDateFormat(type)
     try {
         var date = simpleDateFormat.parse(time)
@@ -39,17 +42,28 @@ fun dateToStamp(time: String, type: String, timeZone: String = COMM_DATE_TIME_ZO
     return time
 }
 
+
+val Long.toDateYmd: String
+    get() = this.toString().toDateYmd
+val Long.toDateYmd_hm: String
+    get() = this.toString().toDateYmd_hm
+val Long.toDateYmd_hms: String
+    get() = this.toString().toDateYmd_hms
+
+val String.toDateYmd: String
+    get() = stampToDate(this)
+val String.toDateYmd_hm: String
+    get() = stampToDate(this, TIME_YYYY_MM_dd_HH_mm)
+val String.toDateYmd_hms: String
+    get() = stampToDate(this, TIME_YYYY_MM_dd_HH_mm_ss)
+
 /**
  *  时间戳转换为时间
  * @param time 待转换的时间戳
  * @param type 格式
  * @param timeZone 时区
  */
-fun stampToDate(time: String, type: String, timeZone: String = COMM_DATE_TIME_ZONE): String {
-    var type = type
-    if (TextUtils.isEmpty(type)) {
-        type = TIME_YYYY_MM_dd
-    }
+fun stampToDate(time: String, type: String = TIME_YYYY_MM_dd, timeZone: String = COMM_DATE_TIME_ZONE): String {
     if (TextUtils.isEmpty(time)) {
         return ""
     }
@@ -123,7 +137,7 @@ fun stampFormDate(argTime: Long): String {
                     cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
         (interval / iMonth).toInt() != 0
         -> strTime =
-            (cal.get(Calendar.MONTH) + 1).toString() + "月" + cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
+                (cal.get(Calendar.MONTH) + 1).toString() + "月" + cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
         (interval / iDay).toInt() != 0
         -> strTime = (cal.get(Calendar.MONTH) + 1).toString() + "月" +
                 cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
@@ -271,10 +285,10 @@ fun timeStampDiffHMS(time1: String, time2: String): String {
         val hours = (diff - days * (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
 
         val minutes =
-            (diff - days * (1000 * 60 * 60 * 24) - hours * (1000 * 60 * 60)) / (1000 * 60)
+                (diff - days * (1000 * 60 * 60 * 24) - hours * (1000 * 60 * 60)) / (1000 * 60)
 
         val miao =
-            (diff - days * (1000 * 60 * 60 * 24) - hours * (1000 * 60 * 60) - minutes * (1000 * 60)) / 1000
+                (diff - days * (1000 * 60 * 60 * 24) - hours * (1000 * 60 * 60) - minutes * (1000 * 60)) / 1000
         CommonLogger("" + days + "天" + hours + "小时" + minutes + "分" + miao + "秒")
         CommonLogger("diff $diff")
         return if (hours == 0L) {
