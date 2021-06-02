@@ -85,8 +85,8 @@ class MainActivity : FragmentActivity() {
         et_path.setText(Environment.getExternalStorageDirectory().toString() + "/")
         shareFile.setOnClickListener {
             requestEasyPermission(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) {
                 var url = stringMerge(et_path.text.toString())
                 Log.e("成功", "合并成功$url")
@@ -98,6 +98,12 @@ class MainActivity : FragmentActivity() {
         Log.e("中文检测", "宽高".isChinese.toString())
         Log.e("英文检测", "Aa".isEnglish.toString())
         Log.e("标点检测", "._-_".isSymbol.toString())
+        val action: (Int) -> Unit = {
+            Log.e("测试", "" + it)
+        }
+        globalLoop(5, 1000, action) {
+            Log.e("测试结束", "测试结束")
+        }
     }
 
 }

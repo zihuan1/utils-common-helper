@@ -14,7 +14,10 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.core.content.ContextCompat.getExternalFilesDirs
 import org.jetbrains.annotations.NotNull
-import java.io.*
+import java.io.File
+import java.io.FileFilter
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.text.DecimalFormat
@@ -196,16 +199,15 @@ fun isExistSDCard(): Boolean {
  * @param delFile 要删除的文件夹或文件名
  * @return 删除成功返回true，否则返回false
  */
-fun delete(delFile: String): Boolean {
-    val file = File(delFile)
-    return if (!file.exists()) {
-        CommonLogger("删除文件失败:" + delFile + "不存在！")
+fun File.delete(): Boolean {
+    return if (!exists()) {
+        CommonLogger("删除文件失败:" + absolutePath + "不存在！")
         false
     } else {
-        if (file.isFile)
-            deleteSingleFile(delFile)
+        if (isFile)
+            deleteSingleFile(absolutePath)
         else
-            deleteDirectory(delFile)
+            deleteDirectory(absolutePath)
     }
 }
 

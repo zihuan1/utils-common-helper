@@ -8,6 +8,7 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
@@ -88,7 +89,7 @@ fun EditText.cursorMoveToPosition(position: Int): EditText {
  */
 fun checkNetworkConnected(): Boolean {
     val mConnectivityManager = CommonContext
-        .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val mNetworkInfo = mConnectivityManager.activeNetworkInfo
     if (mNetworkInfo != null) {
         return mNetworkInfo.isAvailable
@@ -103,7 +104,7 @@ fun checkNetworkConnected(): Boolean {
  */
 fun checkGPSIsOpen(): Boolean {
     val locationManager =
-        CommonContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            CommonContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 }
 
@@ -216,6 +217,32 @@ fun globalDelayPerform(timeMillis: Long, action: () -> Unit) {
         }
     }
 }
+
+private var mCount = 0
+
+//一个回调的轮训
+fun globalLoop(count: Int, delay: Long, action: (Int) -> Unit) {
+    if (mCount < count) {
+        globalDelayPerform(delay) {
+            mCount++
+            action(mCount)
+            globalLoop(count, delay, action)
+        }
+    } else {
+        mCount = 0
+    }
+}
+
+//每次只能使用一个 两个回调
+fun globalLoop(count: Int, delay: Long, action: (Int) -> Unit, action2: () -> Unit) {
+    globalLoop(count, delay) {
+        action(it)
+        if (mCount == count) {
+            action2()
+        }
+    }
+}
+
 
 private var mToast: Toast? = null
 
