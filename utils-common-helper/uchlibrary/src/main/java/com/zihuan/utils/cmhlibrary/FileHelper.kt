@@ -196,10 +196,9 @@ fun isExistSDCard(): Boolean {
 /**
  * 删除文件，可以是文件或文件夹
  *
- * @param delFile 要删除的文件夹或文件名
  * @return 删除成功返回true，否则返回false
  */
-fun File.delete(): Boolean {
+fun File.deleteFile(): Boolean {
     return if (!exists()) {
         CommonLogger("删除文件失败:" + absolutePath + "不存在！")
         false
