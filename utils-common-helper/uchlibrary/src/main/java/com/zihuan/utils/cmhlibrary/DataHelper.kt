@@ -1,5 +1,6 @@
 package com.zihuan.utils.cmhlibrary
 
+import java.math.BigDecimal
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -94,11 +95,10 @@ fun firstNotZero(vararg args: Int): Int {
 /**
  * 保留小数
  */
-fun String.keepDecimal(number: Int = 2) {
-    val num = if (!isNullOrEmpty()) {
-        this
-    } else "0"
-    "%.$number".format(this.toDouble())
+fun String.keepDecimal(number: Int = 2): String {
+    val b = BigDecimal(this.toDouble())
+    val f1 = b.setScale(number, BigDecimal.ROUND_HALF_UP).toDouble()
+    return f1.toString()
 }
 
 /**

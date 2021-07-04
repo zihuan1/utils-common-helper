@@ -59,6 +59,8 @@ class MainActivity : FragmentActivity() {
         removePreference("mobile")
         var mobile2 = findPreference("mobile", "")
         Log.e("删除后输出mobile", "getCommonPreference =$mobile2")
+        val s = "10.0153"
+        Log.e("保留两位小数", s.keepDecimal())
 //        var list = ArrayList<String>()
 //        (0..100).forEach {
 //            list.add("$it")
