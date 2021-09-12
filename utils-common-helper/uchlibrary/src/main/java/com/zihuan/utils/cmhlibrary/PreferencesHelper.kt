@@ -18,6 +18,7 @@ private val mPreferenceList = HashMap<String, SharedPreferences>()
 /**
  * 存储文件默认名称
  */
+@JvmField
 var SHARE_PREFS_DEFAULT_NAME = "commonDefaultName"
 
 @Deprecated(
