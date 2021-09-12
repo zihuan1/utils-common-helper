@@ -38,8 +38,10 @@ class MainActivity : FragmentActivity() {
         val mo1 = 123456L
         val mo2 = 123456.2
         mo1.savePreference("123")
-        mo2.savePreference("123")
+        mo2.savePreference("name")
         mo.savePreference("mobile")
+        val ceshi = "ceshi2"
+        "多文件存储测试".savePreference("test", ceshi)
         Log.e("缓存文件", getDiskCacheFile())
         Log.e("缓存数据", getDiskCacheData())
         Log.e("缓存文件", getDiskCacheFile(true))
@@ -58,7 +60,13 @@ class MainActivity : FragmentActivity() {
         Log.e("输出mobile", "getCommonPreference =$mobile")
         removePreference("mobile")
         var mobile2 = findPreference("mobile", "")
-        Log.e("删除后输出mobile", "getCommonPreference =$mobile2")
+        Log.e("删除后输出 mobile ", "mobile =$mobile2")
+        Log.e("删除后输出其他默认文件值 name ", "name =${findPreference("name", "")}")
+        clearPreference()
+        Log.e("清除默认存储后获取 name ", "name =${findPreference("name", "")}")
+        Log.e("清除默认文件后获取 ceshi2 ", "ceshi2 =${findPreference("test", "",ceshi)}")
+        clearAllPreference()
+        Log.e("清除所有文件后获取 ceshi2 ", "ceshi2 =${findPreference("test", "",ceshi)}")
         val s = "10.0153"
         Log.e("保留两位小数", s.keepDecimal())
 //        var list = ArrayList<String>()
