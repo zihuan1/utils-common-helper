@@ -15,17 +15,28 @@ import com.github.dfqin.grantor.PermissionsUtil
  * 请求存储权限
  */
 inline fun storagePermission(crossinline action: (pass: Boolean) -> Unit) {
-    requestEasyPermission(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,action=action)
+    requestEasyPermission(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        action = action
+    )
+}
+
+inline fun storageOk(crossinline action: () -> Unit) {
+    storagePermission { if (it) action() }
 }
 
 /**
  * 相机权限
  */
 inline fun cameraPermission(crossinline action: (pass: Boolean) -> Unit) {
-    requestEasyPermission(Manifest.permission.CAMERA,action=action)
+    requestEasyPermission(Manifest.permission.CAMERA, action = action)
 }
 
-inline fun requestEasyPermission(vararg permissions: String, crossinline action: (pass: Boolean) -> Unit) {
+inline fun requestEasyPermission(
+    vararg permissions: String,
+    crossinline action: (pass: Boolean) -> Unit
+) {
     var permission = object : PermissionListener {
         override fun permissionGranted(permission: Array<out String>) {
             action(true)
