@@ -96,8 +96,8 @@ fun drawableToBitmap(vectorDrawableId: Int): Bitmap {
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
         val vectorDrawable: Drawable = CommonContext.getDrawable(vectorDrawableId)
         bitmap = Bitmap.createBitmap(
-                vectorDrawable.intrinsicWidth,
-                vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888
+            vectorDrawable.intrinsicWidth,
+            vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888
         )
         val canvas = Canvas(bitmap)
         vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
@@ -119,8 +119,8 @@ fun readPictureDegree(path: String): Int {
     try {
         val exifInterface = ExifInterface(path)
         when (exifInterface.getAttributeInt(
-                ExifInterface.TAG_ORIENTATION,
-                ExifInterface.ORIENTATION_NORMAL
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
         )) {
             ExifInterface.ORIENTATION_ROTATE_90 -> degree = 90
             ExifInterface.ORIENTATION_ROTATE_180 -> degree = 180
@@ -197,7 +197,8 @@ fun Bitmap.modifySize(width: Int, height: Int): Bitmap? {
  * Transform source Bitmap to targeted width and height.
  */
 private fun transform(
-        scaler: Matrix?, source: Bitmap, targetWidth: Int, targetHeight: Int, options: Int): Bitmap {
+    scaler: Matrix?, source: Bitmap, targetWidth: Int, targetHeight: Int, options: Int
+): Bitmap {
     var scaler = scaler
     val scaleUp = options and 1 != 0
     val recycle = options and 1 != 0
@@ -205,26 +206,26 @@ private fun transform(
     val deltaY = source.height - targetHeight
     if (!scaleUp && (deltaX < 0 || deltaY < 0)) {
         val b2 = Bitmap.createBitmap(
-                targetWidth, targetHeight,
-                Bitmap.Config.ARGB_8888
+            targetWidth, targetHeight,
+            Bitmap.Config.ARGB_8888
         )
         val c = Canvas(b2)
 
         val deltaXHalf = max(0, deltaX / 2)
         val deltaYHalf = max(0, deltaY / 2)
         val src = Rect(
-                deltaXHalf,
-                deltaYHalf,
-                deltaXHalf + min(targetWidth, source.width),
-                deltaYHalf + min(targetHeight, source.height)
+            deltaXHalf,
+            deltaYHalf,
+            deltaXHalf + min(targetWidth, source.width),
+            deltaYHalf + min(targetHeight, source.height)
         )
         val dstX = (targetWidth - src.width()) / 2
         val dstY = (targetHeight - src.height()) / 2
         val dst = Rect(
-                dstX,
-                dstY,
-                targetWidth - dstX,
-                targetHeight - dstY
+            dstX,
+            dstY,
+            targetWidth - dstX,
+            targetHeight - dstY
         )
         c.drawBitmap(source, src, dst, null)
         if (recycle) {
@@ -257,8 +258,8 @@ private fun transform(
 
     val b1: Bitmap
     b1 = if (scaler != null) Bitmap.createBitmap(
-            source, 0, 0,
-            source.width, source.height, scaler, true
+        source, 0, 0,
+        source.width, source.height, scaler, true
     ) else {
         source
     }
@@ -326,8 +327,8 @@ fun blur(`in`: IntArray, out: IntArray, width: Int, height: Int, radius: Float) 
         var tb = 0
         for (i in -r..r) {
             val rgb = `in`[inIndex + clamp(
-                    i, 0,
-                    width - 1
+                i, 0,
+                width - 1
             )]
             ta += rgb shr 24 and 0xff
             tr += rgb shr 16 and 0xff
@@ -377,6 +378,14 @@ fun View.toBitmap(): Bitmap {
     val canvas = Canvas(bitmap)
     draw(canvas)
     return bitmap
+}
+
+fun View.toBitmap2(): Bitmap {
+    val screenshot: Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+    val c = Canvas(screenshot)
+    c.translate(-scrollX.toFloat(), -scrollY.toFloat())
+    draw(c)
+    return screenshot
 }
 
 /**
