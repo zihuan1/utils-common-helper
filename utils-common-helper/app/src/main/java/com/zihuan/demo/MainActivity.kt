@@ -6,6 +6,8 @@ import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.zihuan.utils.cmhlibrary.*
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -64,9 +66,9 @@ class MainActivity : FragmentActivity() {
         Log.e("删除后输出其他默认文件值 name ", "name =${findPreference("name", "")}")
         clearPreference()
         Log.e("清除默认存储后获取 name ", "name =${findPreference("name", "")}")
-        Log.e("清除默认文件后获取 ceshi2 ", "ceshi2 =${findPreference("test", "",ceshi)}")
+        Log.e("清除默认文件后获取 ceshi2 ", "ceshi2 =${findPreference("test", "", ceshi)}")
         clearAllPreference()
-        Log.e("清除所有文件后获取 ceshi2 ", "ceshi2 =${findPreference("test", "",ceshi)}")
+        Log.e("清除所有文件后获取 ceshi2 ", "ceshi2 =${findPreference("test", "", ceshi)}")
         val s = "10.0153"
         Log.e("保留两位小数", s.keepDecimal())
 //        var list = ArrayList<String>()
@@ -114,6 +116,30 @@ class MainActivity : FragmentActivity() {
         globalLoop(5, 1000, action) {
             Log.e("测试结束", "测试结束")
         }
+        val entity = WCYXEntity()
+        entity.clock_times = "666"
+        entity.commonXinliName = "测试"
+        entity.xinli_question_count = "777"
+        val list = ArrayList<FinishedBotNames>()
+        (0..5).forEach {
+            val botName = FinishedBotNames()
+            botName.botname = "测试$it"
+            botName.finished_times = "${it + 1}"
+            botName.last_finish_time = "${System.currentTimeMillis() + it}"
+            list.add(botName)
+        }
+        entity.finished_botnames = list
+        entity.last_finish_time = "888"
+        entity.last_finished_botname = "999"
+//        val gosn = Gson()
+        val json =
+            "{\"clock_times\":\"666\",\"commonXinliName\":\"测试\",\"xinli_question_count\":\"777\",\"finished_botnames\":[{\"botname\":\"测试0\",\"finished_times\":\"1\",\"last_finish_time\":\"1633834337258\"},{\"botname\":\"测试1\",\"finished_times\":\"2\",\"last_finish_time\":\"1633834337259\"},{\"botname\":\"测试2\",\"finished_times\":\"3\",\"last_finish_time\":\"1633834337260\"},{\"botname\":\"测试3\",\"finished_times\":\"4\",\"last_finish_time\":\"1633834337261\"},{\"botname\":\"测试4\",\"finished_times\":\"5\",\"last_finish_time\":\"1633834337262\"},{\"botname\":\"测试5\",\"finished_times\":\"6\",\"last_finish_time\":\"1633834337263\"}],\"last_finish_time\":\"888\",\"last_finished_botname\":\"999\"}"
+        val gosn = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
+//{"finished_botnames":[{"botname":"测试0","finished_times":"1","last_finish_time":"1633834273538"},{"botname":"测试1","finished_times":"2","last_finish_time":"1633834273539"},{"botname":"测试2","finished_times":"3","last_finish_time":"1633834273540"},{"botname":"测试3","finished_times":"4","last_finish_time":"1633834273541"},{"botname":"测试4","finished_times":"5","last_finish_time":"1633834273542"},{"botname":"测试5","finished_times":"6","last_finish_time":"1633834273543"}],"last_finish_time":"888","last_finished_botname":"999"}
+        Log.e("GSON to Json", gosn.toJson(entity))
+        val eneity1 = gosn.fromJson(json, WCYXEntity::class.java)
+        Log.e("GSON to Entity", eneity1.toString())
+
     }
 
 }
