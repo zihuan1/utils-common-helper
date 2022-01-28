@@ -1,6 +1,7 @@
 package com.zihuan.utils.cmhlibrary
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Base64
 import android.widget.Toast
 import org.jetbrains.annotations.Nullable
@@ -8,46 +9,61 @@ import java.io.*
 
 
 /**
- * 如果不想用代理的方式存取值,可以用一些方法
+ * 如果不想用代理的方式存取值,可以用快捷方法
  * 存储工作是异步的
  */
 
-private var mName = "commonDefaultName"
+private val mPreferenceList = HashMap<String, SharedPreferences>()
+
+/**
+ * 存储文件默认名称
+ */
+@JvmField
+var SHARE_PREFS_DEFAULT_NAME = "commonDefaultName"
+
+@Deprecated(
+    "直接用SHARE_PREFERENCE_DEFAULT_NAME变量",
+    ReplaceWith("SHARE_PREFERENCE_DEFAULT_NAME = name")
+)
 fun setPreferencesName(@Nullable name: String) {
-    mName = name
+    SHARE_PREFS_DEFAULT_NAME = name
 }
 
-private val prefs by lazy {
-    CommonContext.getSharedPreferences(mName, Context.MODE_PRIVATE)
+fun getShare(name: String = SHARE_PREFS_DEFAULT_NAME): SharedPreferences {
+    if (!mPreferenceList.containsKey(name)) {
+        val share = CommonContext.getSharedPreferences(name, Context.MODE_PRIVATE)
+        mPreferenceList[name] = share
+    }
+    return mPreferenceList[name]!!
 }
-
 
 /**
  * 存储值
  * Double类型的数据会自动转换成String类型存储
  */
-fun Number.savePreference(key: String) {
-    putPreference(key, this)
+fun Number.savePreference(key: String, name: String = SHARE_PREFS_DEFAULT_NAME) {
+    putPreference(key, this, name)
 }
 
-fun String.savePreference(key: String) {
-    putPreference(key, this)
+fun String.savePreference(key: String, name: String = SHARE_PREFS_DEFAULT_NAME) {
+    putPreference(key, this, name)
 }
 
-fun Boolean.savePreference(key: String) {
-    putPreference(key, this)
+fun Boolean.savePreference(key: String, name: String = SHARE_PREFS_DEFAULT_NAME) {
+    putPreference(key, this, name)
 }
-
 
 /**
  * 快速的获取值
  * var value=findPreference()
  */
-fun <T : Any> findPreference(key: String, defValue: T): T {
-    return getPreference(key, defValue)
+
+fun <T : Any> findPreference(key: String, defValue: T, name: String = SHARE_PREFS_DEFAULT_NAME): T {
+    return getPreference(key, defValue, name)
 }
 
-internal fun <T> putPreference(key: String, value: T) {
+internal fun <T> putPreference(key: String, value: T, name: String = SHARE_PREFS_DEFAULT_NAME) {
+    val prefs = getShare(name)
     prefs.edit().apply {
         when (value) {
             is String, is Double -> putString(key, value.toString())
@@ -62,7 +78,12 @@ internal fun <T> putPreference(key: String, value: T) {
     }
 }
 
-internal fun <T> getPreference(key: String, defValue: T): T {
+internal fun <T> getPreference(
+    key: String,
+    defValue: T,
+    name: String = SHARE_PREFS_DEFAULT_NAME
+): T {
+    val prefs = getShare(name)
     return with(prefs) {
         when (defValue) {
             is String -> getString(key, defValue)
@@ -77,23 +98,37 @@ internal fun <T> getPreference(key: String, defValue: T): T {
 }
 
 /**
- * 清除所有数据
+ * 清除默认文件数据
  */
-fun clearPreference() {
+fun clearPreference(name: String = SHARE_PREFS_DEFAULT_NAME) {
+    val prefs = getShare(name)
     prefs.edit().clear().commit()
+}
+
+/**
+ * 清除所有文件数据
+ */
+fun clearAllPreference() {
+    mPreferenceList.forEach { it.value.edit().clear().commit() }
 }
 
 /**
  * 删除单条数据
  */
-fun removePreference(vararg key: String) {
+fun removePreference(vararg key: String, name: String = SHARE_PREFS_DEFAULT_NAME) {
+    val prefs = getShare(name)
     key.forEach {
         prefs.edit().remove(it).commit()
     }
 }
 
 //    存储集合
-fun putHashMap(key: String, map: HashMap<String, Int>): Boolean {
+fun putHashMap(
+    key: String,
+    map: HashMap<String, Int>,
+    name: String = SHARE_PREFS_DEFAULT_NAME
+): Boolean {
+    val prefs = getShare(name)
     val editor = prefs.edit()
     try {
         editor.putString(key, sceneList2String(map))
@@ -105,7 +140,8 @@ fun putHashMap(key: String, map: HashMap<String, Int>): Boolean {
 }
 
 //
-fun getHashMap(key: String): HashMap<String, Int>? {
+fun getHashMap(key: String, name: String = SHARE_PREFS_DEFAULT_NAME): HashMap<String, Int>? {
+    val prefs = getShare(name)
     val liststr = prefs.getString(key, "")
     try {
         return string2SceneList(liststr!!)

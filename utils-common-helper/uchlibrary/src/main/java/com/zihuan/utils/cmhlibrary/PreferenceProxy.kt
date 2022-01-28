@@ -1,14 +1,9 @@
 package com.zihuan.utils.cmhlibrary
 
-import android.content.Context
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class PreferenceProxy<T>(val key: String, val default: T, val preName: String = "default")
-    : ReadWriteProperty<Any?, T> {
-    private val prefs by lazy {
-        CommonContext.getSharedPreferences(preName, Context.MODE_PRIVATE)
-    }
+class PreferenceProxy<T>(private val key: String, private val default: T) : ReadWriteProperty<Any?, T> {
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return getPreference(key,default)
