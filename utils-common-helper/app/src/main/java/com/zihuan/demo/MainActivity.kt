@@ -22,10 +22,10 @@ class MainActivity : FragmentActivity() {
         var email by PreferenceProxy("email", "")
         tv_1.setOnClickListener {
             email = et_path.text.toString()
-//            a.isEmptyExtend {
-//                Log.e("输出1", "测试$a")
-//                return@setOnClickListener
-//            }
+            //            a.isEmptyExtend {
+            //                Log.e("输出1", "测试$a")
+            //                return@setOnClickListener
+            //            }
             Log.e("保存成功", "测试$email")
         }
         tv_2.setOnClickListener {
@@ -71,39 +71,36 @@ class MainActivity : FragmentActivity() {
         Log.e("清除所有文件后获取 ceshi2 ", "ceshi2 =${findPreference("test", "", ceshi)}")
         val s = "10.0153"
         Log.e("保留两位小数", s.keepDecimal())
-//        var list = ArrayList<String>()
-//        (0..100).forEach {
-//            list.add("$it")
-//        }
-//        zrv_test.buildVerticalLayout(ReAdapter()).setData(list)
-//
-//        var test = Child()
-//        val mClass = test.javaClass
-////        var superObj = Child().javaClass
-//        var superClass = mClass.newInstance().javaClass.superclass
-//        var field = superClass.getDeclaredField("mStr")
-//        //取消语法访问检查
-//        field.isAccessible = true
-////        var inputMore = field.get(superClass)
-//        field.set(superClass, "222")
-//        Log.e("反射", mClass.toString())
-//
-//        var ff = getFiledsInfo("com.zihuan.demo.Child")
-//        ff.forEach {
-//            Log.e("反射", it.name)
-//            it.isAccessible = true
-//            var a = it.get("mList")
-//        }
+        //        var list = ArrayList<String>()
+        //        (0..100).forEach {
+        //            list.add("$it")
+        //        }
+        //        zrv_test.buildVerticalLayout(ReAdapter()).setData(list)
+        //
+        //        var test = Child()
+        //        val mClass = test.javaClass
+        ////        var superObj = Child().javaClass
+        //        var superClass = mClass.newInstance().javaClass.superclass
+        //        var field = superClass.getDeclaredField("mStr")
+        //        //取消语法访问检查
+        //        field.isAccessible = true
+        ////        var inputMore = field.get(superClass)
+        //        field.set(superClass, "222")
+        //        Log.e("反射", mClass.toString())
+        //
+        //        var ff = getFiledsInfo("com.zihuan.demo.Child")
+        //        ff.forEach {
+        //            Log.e("反射", it.name)
+        //            it.isAccessible = true
+        //            var a = it.get("mList")
+        //        }
         et_path.setText(Environment.getExternalStorageDirectory().toString() + "/")
         shareFile.setOnClickListener {
-            requestEasyPermission(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) {
+            requestEasyPermission(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE) {
                 var url = stringMerge(et_path.text.toString())
                 Log.e("成功", "合并成功$url")
                 Toast.makeText(this, "成功", Toast.LENGTH_LONG).show()
-//                shareSystem(url)
+                //                shareSystem(url)
             }
         }
         Log.e("宽高", "宽高$screenWidth  $screenHeight  ${screenHeight()}")
@@ -131,15 +128,14 @@ class MainActivity : FragmentActivity() {
         entity.finished_botnames = list
         entity.last_finish_time = "888"
         entity.last_finished_botname = "999"
-//        val gosn = Gson()
-        val json =
-            "{\"clock_times\":\"666\",\"commonXinliName\":\"测试\",\"xinli_question_count\":\"777\",\"finished_botnames\":[{\"botname\":\"测试0\",\"finished_times\":\"1\",\"last_finish_time\":\"1633834337258\"},{\"botname\":\"测试1\",\"finished_times\":\"2\",\"last_finish_time\":\"1633834337259\"},{\"botname\":\"测试2\",\"finished_times\":\"3\",\"last_finish_time\":\"1633834337260\"},{\"botname\":\"测试3\",\"finished_times\":\"4\",\"last_finish_time\":\"1633834337261\"},{\"botname\":\"测试4\",\"finished_times\":\"5\",\"last_finish_time\":\"1633834337262\"},{\"botname\":\"测试5\",\"finished_times\":\"6\",\"last_finish_time\":\"1633834337263\"}],\"last_finish_time\":\"888\",\"last_finished_botname\":\"999\"}"
+        //        val gosn = Gson()
+        val json = "{\"clock_times\":\"666\",\"commonXinliName\":\"测试\",\"xinli_question_count\":\"777\",\"finished_botnames\":[{\"botname\":\"测试0\",\"finished_times\":\"1\",\"last_finish_time\":\"1633834337258\"},{\"botname\":\"测试1\",\"finished_times\":\"2\",\"last_finish_time\":\"1633834337259\"},{\"botname\":\"测试2\",\"finished_times\":\"3\",\"last_finish_time\":\"1633834337260\"},{\"botname\":\"测试3\",\"finished_times\":\"4\",\"last_finish_time\":\"1633834337261\"},{\"botname\":\"测试4\",\"finished_times\":\"5\",\"last_finish_time\":\"1633834337262\"},{\"botname\":\"测试5\",\"finished_times\":\"6\",\"last_finish_time\":\"1633834337263\"}],\"last_finish_time\":\"888\",\"last_finished_botname\":\"999\"}"
         val gosn = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
-//{"finished_botnames":[{"botname":"测试0","finished_times":"1","last_finish_time":"1633834273538"},{"botname":"测试1","finished_times":"2","last_finish_time":"1633834273539"},{"botname":"测试2","finished_times":"3","last_finish_time":"1633834273540"},{"botname":"测试3","finished_times":"4","last_finish_time":"1633834273541"},{"botname":"测试4","finished_times":"5","last_finish_time":"1633834273542"},{"botname":"测试5","finished_times":"6","last_finish_time":"1633834273543"}],"last_finish_time":"888","last_finished_botname":"999"}
+        //{"finished_botnames":[{"botname":"测试0","finished_times":"1","last_finish_time":"1633834273538"},{"botname":"测试1","finished_times":"2","last_finish_time":"1633834273539"},{"botname":"测试2","finished_times":"3","last_finish_time":"1633834273540"},{"botname":"测试3","finished_times":"4","last_finish_time":"1633834273541"},{"botname":"测试4","finished_times":"5","last_finish_time":"1633834273542"},{"botname":"测试5","finished_times":"6","last_finish_time":"1633834273543"}],"last_finish_time":"888","last_finished_botname":"999"}
         Log.e("GSON to Json", gosn.toJson(entity))
         val eneity1 = gosn.fromJson(json, WCYXEntity::class.java)
         Log.e("GSON to Entity", eneity1.toString())
-
+        Log.e("toStamp10 ", "2023-4-21".toStamp10 + " " + "2023-4-21".toStamp13)
     }
 
 }

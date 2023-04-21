@@ -6,6 +6,7 @@ import android.util.Log
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 
 /**
  * 日期转换工具类
@@ -20,10 +21,18 @@ const val TIME_YYYY_MM_dd_HH_mm = "yyyy-MM-dd HH:mm"
  * 时间转换为时间戳
  */
 val String.toStamp10: String
-    get() = stampToDate(this)
+    get() {
+        var dType = ""
+        if (isDate(this)) {
+            dType = dateTypeMatch()
+        } else {
+            return this
+        }
+        return dateToStamp(this, dType)
+    }
 
 val String.toStamp13: String
-    get() = (stampToDate(this).toLong() * 1000).toString()
+    get() = (toStamp10.toLong() * 1000).toString()
 
 /**
  * 时间转换为时间戳
@@ -31,11 +40,7 @@ val String.toStamp13: String
  * @param type 格式
  * @param timeZone 时区，默认是北京时区
  */
-fun dateToStamp(
-    time: String,
-    type: String = TIME_YYYY_MM_dd_HH_mm_ss,
-    timeZone: String = COMM_DATE_TIME_ZONE
-): String {
+fun dateToStamp(time: String, type: String = TIME_YYYY_MM_dd_HH_mm_ss, timeZone: String = COMM_DATE_TIME_ZONE): String {
     var time = time
     val simpleDateFormat = SimpleDateFormat(type)
     try {
@@ -70,11 +75,7 @@ val String.toDateYmd_hms: String
  * @param type 格式
  * @param timeZone 时区
  */
-fun stampToDate(
-    time: String,
-    type: String = TIME_YYYY_MM_dd,
-    timeZone: String = COMM_DATE_TIME_ZONE
-): String {
+fun stampToDate(time: String, type: String = TIME_YYYY_MM_dd, timeZone: String = COMM_DATE_TIME_ZONE): String {
     if (TextUtils.isEmpty(time)) {
         return ""
     }
@@ -89,6 +90,52 @@ fun stampToDate(
     return date + ""
 }
 
+/**
+ * 获取当前时间的格式,必须是年月日时分秒等顺序格式
+ *
+ */
+fun String.dateTypeMatch(): String {
+    val date = dateTypeCover().split("-")
+    val type = when (date.size) {
+        3 -> TIME_YYYY_MM_dd
+        5 -> TIME_YYYY_MM_dd_HH_mm
+        6 -> TIME_YYYY_MM_dd_HH_mm_ss
+        else -> {
+            var forecast = ""
+            val t = arrayOf("yyyy", "MM", "dd", "HH", "mm", "ss")
+            if (date.size > t.size) return ""
+            date.forEachIndexed { index, s ->
+                forecast += t[index]
+            }
+            forecast
+        }
+    }
+    return type
+}
+
+/**
+ * 将时间格式分隔符转换为指定字符
+ */
+fun String.dateTypeCover(dType: String = "-"): String {
+    var date = replace(".", dType)
+    DATE_CN_TYPE.forEach { date = date.replace(it, "-") }
+    return date
+}
+
+private val DATE_CN_TYPE by lazy { arrayOf("年", "月", "日", "时", "分", "秒") }
+
+/**
+ * 验证日期（年月日）
+ *
+ * @param "date" 日期，格式：1992-09-03，或1992.09.03
+ * @return 验证成功返回true，验证失败返回false
+ */
+fun isDate(date: String): Boolean {
+    var date = date
+    DATE_CN_TYPE.forEach { date = date.replace(it, "-") }
+    val regex = "[0-9]{4}([-./])\\d{1,2}\\1\\d{1,2}"
+    return Pattern.matches(regex, date)
+}
 
 /**
  * 时间戳距当前多长时间
@@ -104,8 +151,7 @@ fun stampFormDate(argTime: String?): String? {
     cal.time = mData
     var strTime: String? = null
     var interval = (System.currentTimeMillis() - mData.time) / 1000
-    if (interval < 0)
-        interval = 0
+    if (interval < 0) interval = 0
     val iMinute = 60
     val iHour = 60 * iMinute
     val iDay = 24 * iHour
@@ -113,11 +159,9 @@ fun stampFormDate(argTime: String?): String? {
     strTime = when {
         interval.toInt() in 1..59 -> "" + interval.toInt() + "秒前"
         (interval / iMinute).toInt() in 1..59 -> "" + (interval / iMinute).toInt() + "分钟前"
-        (interval / iHour).toInt() in 1..23 ->
-            "" + (interval / iHour).toInt() + "小时前"
+        (interval / iHour).toInt() in 1..23 -> "" + (interval / iHour).toInt() + "小时前"
         (interval / iDay).toInt() in 1..1 -> "" + (interval / iDay).toInt() + "天前"
-        else ->
-            SimpleDateFormat("MM月dd日 HH:mm").format(Date(time))
+        else -> SimpleDateFormat("MM月dd日 HH:mm").format(Date(time))
     }
     return strTime
 }
@@ -135,27 +179,18 @@ fun stampFormDate(argTime: Long): String {
 
     val strTime: String
     var interval = (System.currentTimeMillis() - mData.time) / 1000
-    if (interval < 0)
-        interval = 0
+    if (interval < 0) interval = 0
     val iMinute = 60
     val iHour = 60 * iMinute
     val iDay = 24 * iHour
     val iMonth = 30 * iDay
     val iYear = 365 * iMonth
     when {
-        (interval / iYear).toInt() != 0 ->
-            strTime = cal.get(Calendar.YEAR).toString() + "年" + cal.get(Calendar.MONTH) + "月" +
-                    cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
-        (interval / iMonth).toInt() != 0
-        -> strTime =
+        (interval / iYear).toInt() != 0 -> strTime = cal.get(Calendar.YEAR).toString() + "年" + cal.get(Calendar.MONTH) + "月" + cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
+        (interval / iMonth).toInt() != 0 -> strTime = (cal.get(Calendar.MONTH) + 1).toString() + "月" + cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
+        (interval / iDay).toInt() != 0 -> strTime = (cal.get(Calendar.MONTH) + 1).toString() + "月" + cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
+        (interval / iHour).toInt() != 0 -> strTime = if (interval / iHour >= 2) {
             (cal.get(Calendar.MONTH) + 1).toString() + "月" + cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
-        (interval / iDay).toInt() != 0
-        -> strTime = (cal.get(Calendar.MONTH) + 1).toString() + "月" +
-                cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
-        (interval / iHour).toInt() != 0
-        -> strTime = if (interval / iHour >= 2) {
-            (cal.get(Calendar.MONTH) + 1).toString() + "月" +
-                    cal.get(Calendar.DAY_OF_MONTH) + "日" + dateString
         } else {
             (interval / iHour).toString() + "小时前"
         }
@@ -169,7 +204,7 @@ fun stampFormDate(argTime: Long): String {
 // 获得系统时间自定义类型
 fun getSysTimeType(type: String = TIME_YYYY_MM_dd_HH_mm_ss): String {
     val formatter = SimpleDateFormat(type)
-    val curDate = Date(System.currentTimeMillis())//获取当前时间
+    val curDate = Date(System.currentTimeMillis()) //获取当前时间
     return formatter.format(curDate)
 }
 
@@ -285,21 +320,19 @@ fun getApartDay(a: String, b: String): Int {
 fun timeStampDiffHMS(time1: String, time2: String): String {
     val df = SimpleDateFormat(TIME_YYYY_MM_dd_HH_mm_ss)
     try {
-        val d1 = df.parse(time1)//当前时间
+        val d1 = df.parse(time1) //当前时间
 
-        val d2 = df.parse(time2)//过去时间
+        val d2 = df.parse(time2) //过去时间
 
-        val diff = d1.time - d2.time//这样得到的差值是微秒级别
+        val diff = d1.time - d2.time //这样得到的差值是微秒级别
 
         val days = diff / (1000 * 60 * 60 * 24)
 
         val hours = (diff - days * (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
 
-        val minutes =
-            (diff - days * (1000 * 60 * 60 * 24) - hours * (1000 * 60 * 60)) / (1000 * 60)
+        val minutes = (diff - days * (1000 * 60 * 60 * 24) - hours * (1000 * 60 * 60)) / (1000 * 60)
 
-        val miao =
-            (diff - days * (1000 * 60 * 60 * 24) - hours * (1000 * 60 * 60) - minutes * (1000 * 60)) / 1000
+        val miao = (diff - days * (1000 * 60 * 60 * 24) - hours * (1000 * 60 * 60) - minutes * (1000 * 60)) / 1000
         CommonLogger("" + days + "天" + hours + "小时" + minutes + "分" + miao + "秒")
         CommonLogger("diff $diff")
         return if (hours == 0L) {
@@ -320,12 +353,12 @@ fun timeStampDiffHMS(time1: String, time2: String): String {
 fun timeStampDiffSecond(time1: String, time2: String): String {
     val df = SimpleDateFormat(TIME_YYYY_MM_dd_HH_mm_ss)
     try {
-        val d1 = df.parse(time1)//当前时间
+        val d1 = df.parse(time1) //当前时间
 
-        val d2 = df.parse(time2)//过去时间
+        val d2 = df.parse(time2) //过去时间
         val diff: Long
 
-        diff = d2.time - d1.time//这样得到的差值是微秒级别
+        diff = d2.time - d1.time //这样得到的差值是微秒级别
 
         //            long year = diff / (1000 * 60 * 60 * 24 *365);
 

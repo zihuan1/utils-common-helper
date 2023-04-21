@@ -169,13 +169,6 @@ val Float.xsp: Float
     get() = this / CommonContext.resources.displayMetrics.scaledDensity
 
 
-//private fun <T : Number> T.compare(i: Number): Number {
-//    return when (i) {
-//        is Int -> i
-//        else -> i as Long
-//    }
-//}
-
 
 /**
  * 去除特殊字符或将所有中文标号替换为英文标号
@@ -185,8 +178,7 @@ val Float.xsp: Float
  */
 fun stringFilter(str: String): String {
     var str = str
-    str = str.replace("【".toRegex(), "[").replace("】".toRegex(), "]")
-        .replace("！".toRegex(), "!").replace("：".toRegex(), ":")// 替换中文标号
+    str = str.replace("【".toRegex(), "[").replace("】".toRegex(), "]").replace("！".toRegex(), "!").replace("：".toRegex(), ":") // 替换中文标号
     val regEx = "[『』]" // 清除掉特殊字符
     val p = Pattern.compile(regEx)
     val m = p.matcher(str)
@@ -205,9 +197,7 @@ fun transMap2String(map: Map<*, *>): String {
     val iterator = map.entries.iterator()
     while (iterator.hasNext()) {
         entry = iterator.next() as java.util.Map.Entry<*, *>
-        sb.append(entry.key.toString()).append("=").append(
-            if (null == entry.value) "" else entry.value.toString()
-        ).append(if (iterator.hasNext()) "&" else "")
+        sb.append(entry.key.toString()).append("=").append(if (null == entry.value) "" else entry.value.toString()).append(if (iterator.hasNext()) "&" else "")
     }
     return sb.toString()
 }
@@ -242,4 +232,33 @@ fun matcher(text: CharSequence, regular: String): Boolean {
     val pattern: Pattern = Pattern.compile(regular)
     matcher = pattern.matcher(text)
     return matcher.matches()
+}
+/**
+ * 根据资源id获取字符串
+ */
+fun getString(res: Int): String {
+    if (res == 0) return ""
+    return CommonContext.resources.getString(res)
+}
+
+/**
+ * 将多个字资源id转换成集合
+ */
+fun getString(vararg res: Int) = res.map { CommonContext.resources.getString(it) }
+
+/**
+ * 在指定的字符位置后面添加特殊符号
+ * @param limit 大于几个字符生效
+ * @param pos 在pos字符位置后面添加回车
+ * @param symbol 特殊符号
+ */
+fun String.enter(limit: Int = 3, pos: Int = 2, symbol: String = "\n"): String {
+    //    val chat = toCharArray().toMutableList()
+    //    chat.add(pos, '\n')
+    //    chat.joinToString("")
+    val text = if (length > limit) {
+        val sub = subSequence(0, pos).toString()
+        replace(sub, "$sub$symbol")
+    } else this
+    return text
 }

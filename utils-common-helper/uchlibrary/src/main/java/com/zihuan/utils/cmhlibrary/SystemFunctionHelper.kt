@@ -293,7 +293,7 @@ fun getAvailableMemorySize(): String {
 fun isCharging(): Boolean {
     val batteryBroadcast =
         CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-    return batteryBroadcast.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) != 0
+    return batteryBroadcast!!.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) != 0
 }
 
 /**
@@ -302,7 +302,7 @@ fun isCharging(): Boolean {
 fun batterState(): Int {
     val batteryBroadcast =
         CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-    return batteryBroadcast.getIntExtra(
+    return batteryBroadcast!!.getIntExtra(
         BatteryManager.EXTRA_STATUS,
         BatteryManager.BATTERY_STATUS_UNKNOWN
     )
@@ -318,7 +318,7 @@ fun getCurrentBattery(): Int {
     } else {
         val intent =
             CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        intent.getIntExtra(
+        intent!!.getIntExtra(
             BatteryManager.EXTRA_LEVEL,
             -1
         ) * 100 / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)

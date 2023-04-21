@@ -1,15 +1,21 @@
 package com.zihuan.utils.cmhlibrary
 
+import android.content.ContentValues
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.media.ExifInterface
+import android.media.MediaScannerConnection
 import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.logging.Logger
 import kotlin.math.max
 import kotlin.math.min
 
@@ -20,6 +26,7 @@ import kotlin.math.min
  * @param fileName
  * @param quality     保存的质量（0-100）
  * @param fScale      压缩比率 1为原图
+ *
  */
 fun Bitmap.save(path: String, fileName: String, quality: Int = 100, fScale: Float = 1f): String {
     val pFileDir = File(path)
@@ -59,6 +66,65 @@ fun Bitmap.save(path: String, fileName: String, quality: Int = 100, fScale: Floa
     return url
 }
 
+fun Bitmap.save(fileName: String, quality: Int = 100, fScale: Float = 1f): Boolean {
+    try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val resolver = CommonContext.contentResolver
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/PerracoLabs")
+            }
+            val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            resolver.openOutputStream(uri!!).use {
+                val stream = BufferedOutputStream(it)
+                val newBitmap = if (fScale == 1f) {
+                    Bitmap.createBitmap(this)
+                } else {
+                    compressImage(this, fScale)
+                }
+                newBitmap.compress(Bitmap.CompressFormat.PNG, quality, stream)
+                stream.flush()//输出
+                stream.close()//关闭
+                it!!.close()
+                newBitmap.recycle()
+            }
+        } else {
+            val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
+            var url = ""
+            val pFileDir = File(path)
+            val pFilePath = File(pFileDir, fileName)
+            if (!pFileDir.exists()) {
+                pFileDir.mkdirs()//如果路径不存在就先创建路径
+            }
+            val it = FileOutputStream(pFilePath)
+            val stream = BufferedOutputStream(it)
+            val newBitmap = if (fScale == 1f) Bitmap.createBitmap(this) else compressImage(this, fScale)
+            newBitmap.compress(Bitmap.CompressFormat.PNG, quality, stream)
+            url = pFilePath.absolutePath
+            stream.flush()//输出
+            stream.close()//关闭
+            it.close()
+            newBitmap.recycle()
+            //            检测图片是否被旋转
+            val arg = readPictureDegree(url)
+            if (arg != 0) {
+                //修复旋转重新保存
+                rotatingImageView(arg, this).save(path, fileName, quality, fScale)
+            }
+            //            MediaStore.Images.Media.insertImage(AppContext.contentResolver, url, fileName, null);
+            MediaScannerConnection.scanFile(CommonContext, arrayOf(url), arrayOf("image/jpeg")) { path, uri ->
+                CommonLogger("刷新完成 $path uri $uri")
+            }
+            //            refreshGallery(path)
+        }
+    } catch (e: Exception) {
+        CommonLogger("图片保存失败$e")
+        return false
+    }
+    return true
+}
+
 /**
  * 压缩图片到原大小的scale倍 (100)
  * @param argBitmap 原图片
@@ -94,7 +160,7 @@ fun compressImage(argBitmap: Bitmap, fScale: Float): Bitmap {
 fun drawableToBitmap(vectorDrawableId: Int): Bitmap {
     var bitmap: Bitmap? = null
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-        val vectorDrawable: Drawable = CommonContext.getDrawable(vectorDrawableId)
+        val vectorDrawable: Drawable = CommonContext.getDrawable(vectorDrawableId)!!
         bitmap = Bitmap.createBitmap(
             vectorDrawable.intrinsicWidth,
             vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888

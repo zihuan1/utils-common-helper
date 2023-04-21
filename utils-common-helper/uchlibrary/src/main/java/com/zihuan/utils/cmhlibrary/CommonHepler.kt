@@ -296,13 +296,13 @@ val rootPath: String
  * 获取当前应用缓存路径.
  * @param invisibleCache 不可见缓存路径
  */
-fun getDiskCacheFile(invisibleCache: Boolean = false): String {
+fun getDiskCacheFile(invisibleCache: Boolean = false): String? {
     var path: String? = null
     val visibleCache = Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
             || !Environment.isExternalStorageRemovable()
     path = if (visibleCache && !invisibleCache) {
         //长时间存放的数据 /sdcard/Android/data/包名/file
-        CommonContext.getExternalFilesDir("").path
+        CommonContext.getExternalFilesDir("")?.path
     } else {
         //获取到的是 /data/data/包名/file
         CommonContext.filesDir.path
@@ -314,13 +314,13 @@ fun getDiskCacheFile(invisibleCache: Boolean = false): String {
  * 获取当前应用缓存路径.
  * @param invisibleCache 不可见缓存路径
  */
-fun getDiskCacheData(invisibleCache: Boolean = false): String {
+fun getDiskCacheData(invisibleCache: Boolean = false): String? {
     var cachePath: String? = null
     val visibleCache = Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
             || !Environment.isExternalStorageRemovable()
     cachePath = if (visibleCache && !invisibleCache) {
         //临时数据 /sdcard/Android/data/包名/cache
-        CommonContext.externalCacheDir.path
+        CommonContext.externalCacheDir?.path
     } else {
         //获取到的是 /data/data/包名/cache
         CommonContext.cacheDir.path

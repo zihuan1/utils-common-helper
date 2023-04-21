@@ -56,11 +56,7 @@ open class TextWatcherSample : TextWatcher {
     override fun afterTextChanged(s: Editable) {}
 }
 
-fun EditText.textChangeListener(
-    before: (String) -> Unit = {},
-    onText: (String) -> Unit = {},
-    after: (String) -> Unit = {}
-) {
+fun EditText.textChangeListener(before: (String) -> Unit = {}, onText: (String) -> Unit = {}, after: (String) -> Unit = {}) {
     addTextChangedListener(object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             before(s.toString())
@@ -88,10 +84,29 @@ fun EditText.afterTextChanged(action: (String) -> Unit) {
     textChangeListener(after = action)
 }
 
+fun ValueAnimator.onEnd(action: (Boolean) -> Unit): ValueAnimator {
+    addListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator?, isReverse: Boolean) {
+            action(isReverse)
+        }
+    })
+    return this
+}
+
+
+fun ValueAnimator.onStart(action: (Boolean) -> Unit): ValueAnimator {
+    addListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationStart(animation: Animator?, isReverse: Boolean) {
+            action(isReverse)
+        }
+    })
+    return this
+}
+
 /**
  * 动画监听
  */
-fun ValueAnimator.animUpdate(action: (ValueAnimator) -> Unit): ValueAnimator {
+fun ValueAnimator.onUpdate(action: (ValueAnimator) -> Unit): ValueAnimator {
     addUpdateListener {
         action(it)
     }
