@@ -87,15 +87,6 @@ fun EditText.afterTextChanged(action: (String) -> Unit) {
     textChangeListener(after = action)
 }
 
-fun ValueAnimator.onEnd(action: (Boolean) -> Unit): ValueAnimator {
-    addListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationEnd(animation: Animator, isReverse: Boolean) {
-            action(isReverse)
-        }
-    })
-    return this
-}
-
 fun ValueAnimator.onStart(action: (Boolean) -> Unit): ValueAnimator {
     addListener(object : AnimatorListenerAdapter() {
         override fun onAnimationStart(animation: Animator, isReverse: Boolean) {
@@ -115,11 +106,37 @@ fun ValueAnimator.onUpdate(action: (ValueAnimator) -> Unit): ValueAnimator {
     return this
 }
 
+fun ValueAnimator.onEnd(action: (Boolean) -> Unit): ValueAnimator {
+    addListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator, isReverse: Boolean) {
+            action(isReverse)
+        }
+    })
+    return this
+}
+
+fun ViewPropertyAnimator.onStart(action: (Boolean) -> Unit): ViewPropertyAnimator {
+    setListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationStart(animation: Animator, isReverse: Boolean) {
+            action(isReverse)
+        }
+    })
+    return this
+}
 
 fun ViewPropertyAnimator.onUpdate(action: (ValueAnimator) -> Unit) {
     setUpdateListener {
         action(it)
     }
+}
+
+fun ViewPropertyAnimator.onEnd(action: (Boolean) -> Unit): ViewPropertyAnimator {
+    setListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator, isReverse: Boolean) {
+            action(isReverse)
+        }
+    })
+    return this
 }
 
 /**
