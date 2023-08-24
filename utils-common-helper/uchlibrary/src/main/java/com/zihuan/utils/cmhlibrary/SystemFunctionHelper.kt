@@ -17,7 +17,10 @@ import android.provider.Settings
 import android.text.format.Formatter
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
+import com.zihuan.utils.cmhlibrary.data.EncryptionUtils.MD5
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 val SELECT_FILE_REQUESTCODE = 10086
 
@@ -55,12 +58,7 @@ fun openSystemCall(phone: String) {
 fun getBitmapFromAlbum(): Bitmap? {
     val albumList = getPhotoAlbum()
     return if (albumList != null && albumList.isNotEmpty()) {
-        MediaStore.Images.Thumbnails.getThumbnail(
-            CommonContext.contentResolver,
-            albumList[0].toLong(),
-            MediaStore.Images.Thumbnails.MICRO_KIND,
-            null
-        )
+        MediaStore.Images.Thumbnails.getThumbnail(CommonContext.contentResolver, albumList[0].toLong(), MediaStore.Images.Thumbnails.MICRO_KIND, null)
     } else null
 }
 
@@ -68,12 +66,11 @@ fun getBitmapFromAlbum(): Bitmap? {
  * 方法描述：按相册获取图片信息
  */
 // 设置获取图片的字段信息
-private val STORE_IMAGES = arrayOf(
-    MediaStore.Images.Media.DISPLAY_NAME, // 显示的名称
-    MediaStore.Images.Media.DATA, MediaStore.Images.Media.LONGITUDE, // 经度
-    MediaStore.Images.Media._ID, // id
-    MediaStore.Images.Media.BUCKET_ID, // dir id 目录
-    MediaStore.Images.Media.BUCKET_DISPLAY_NAME // dir name 目录名字
+private val STORE_IMAGES = arrayOf(MediaStore.Images.Media.DISPLAY_NAME, // 显示的名称
+        MediaStore.Images.Media.DATA, MediaStore.Images.Media.LONGITUDE, // 经度
+        MediaStore.Images.Media._ID, // id
+        MediaStore.Images.Media.BUCKET_ID, // dir id 目录
+        MediaStore.Images.Media.BUCKET_DISPLAY_NAME // dir name 目录名字
 )
 
 /**
@@ -83,10 +80,7 @@ private val STORE_IMAGES = arrayOf(
  */
 fun getPhotoAlbum(): List<Int> {
     val aibumList = ArrayList<Int>()
-    val cursor = MediaStore.Images.Media.query(
-        CommonContext.contentResolver,
-        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, STORE_IMAGES
-    )
+    val cursor = MediaStore.Images.Media.query(CommonContext.contentResolver, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, STORE_IMAGES)
     while (cursor.moveToNext()) {
         val id = cursor.getString(3)
         aibumList.add(Integer.parseInt(id))
@@ -155,15 +149,7 @@ fun Activity.selectFile() {
 fun refreshFile(filePath: String, action: () -> Unit) {
     val file = File(filePath)
     val mtm = MimeTypeMap.getSingleton()
-    MediaScannerConnection.scanFile(
-        CommonContext,
-        arrayOf(file.toString()),
-        arrayOf(
-            mtm.getMimeTypeFromExtension(
-                file.toString().substring(file.toString().lastIndexOf(".") + 1)
-            )
-        )
-    ) { path, uri -> action() }
+    MediaScannerConnection.scanFile(CommonContext, arrayOf(file.toString()), arrayOf(mtm.getMimeTypeFromExtension(file.toString().substring(file.toString().lastIndexOf(".") + 1)))) { path, uri -> action() }
 }
 
 /**
@@ -194,8 +180,7 @@ fun Activity.changeBrightness(brightness: Float) {
 fun getBrightness(): Int {
     var systemBrightness = 0
     try {
-        systemBrightness =
-            Settings.System.getInt(CommonContext.contentResolver, Settings.System.SCREEN_BRIGHTNESS)
+        systemBrightness = Settings.System.getInt(CommonContext.contentResolver, Settings.System.SCREEN_BRIGHTNESS)
     } catch (e: Settings.SettingNotFoundException) {
     }
     return systemBrightness
@@ -215,9 +200,9 @@ private var mAudioManager: AudioManager? = null
 private fun initAudioManager() {
     mAudioManager = CommonContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     mAudioManager?.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//            mAudioManager?.requestAudioFocus(AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).build())
-//        }
+    //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+    //            mAudioManager?.requestAudioFocus(AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).build())
+    //        }
 }
 
 /**
@@ -249,11 +234,11 @@ fun setVolume(volume: Int) {
 fun releaseAudioManager() {
     //放弃音频焦点。使以前的焦点所有者(如果有的话)接收焦点。
     mAudioManager?.abandonAudioFocus(null)
-//    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//        mAudioManager?.abandonAudioFocusRequest(
-//            AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).build()
-//        )
-//    }
+    //    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+    //        mAudioManager?.abandonAudioFocusRequest(
+    //            AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).build()
+    //        )
+    //    }
     //置空
     mAudioManager = null
 }
@@ -291,8 +276,7 @@ fun getAvailableMemorySize(): String {
  * 获取当前电池是否充电
  */
 fun isCharging(): Boolean {
-    val batteryBroadcast =
-        CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+    val batteryBroadcast = CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
     return batteryBroadcast!!.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) != 0
 }
 
@@ -300,12 +284,8 @@ fun isCharging(): Boolean {
  * @return 2（BatteryManager.BATTERY_STATUS_CHARGING） 充电中 5（BatteryManager.BATTERY_STATUS_FULL）充电完成
  */
 fun batterState(): Int {
-    val batteryBroadcast =
-        CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-    return batteryBroadcast!!.getIntExtra(
-        BatteryManager.EXTRA_STATUS,
-        BatteryManager.BATTERY_STATUS_UNKNOWN
-    )
+    val batteryBroadcast = CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+    return batteryBroadcast!!.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)
 }
 
 /**
@@ -316,11 +296,28 @@ fun getCurrentBattery(): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     } else {
-        val intent =
-            CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        intent!!.getIntExtra(
-            BatteryManager.EXTRA_LEVEL,
-            -1
-        ) * 100 / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+        val intent = CommonContext.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        intent!!.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) * 100 / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
     }
+}
+
+/**
+ * 获取设备ID
+ */
+fun getDeviceId(action: (String) -> Unit) {
+    var deviceId = Settings.Secure.getString(CommonContext.contentResolver, Settings.Secure.ANDROID_ID)
+    if (deviceId.isNullOrEmpty()) {
+        deviceId = MD5(getDeviceUUID())
+    }
+    //    Logger.e("设备id deviceId=${deviceId} MD5_32=${MD5(getDeviceUUID())}")
+    action(deviceId)
+}
+
+/**
+ * 根据设备信息生成设备ID
+ */
+fun getDeviceUUID(): String {
+    val dev = "100001" + Build.BOARD + Build.BRAND + Build.DEVICE + Build.HARDWARE + Build.ID + Build.MODEL + Build.PRODUCT
+    //    Logger.e("设备初始id $dev")
+    return UUID(dev.hashCode().toLong(), Build.PRODUCT.hashCode().toLong()).toString()
 }

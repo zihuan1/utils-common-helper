@@ -3,6 +3,7 @@ package com.zihuan.utils.cmhlibrary
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import android.net.NetworkInfo
 import android.os.Build
 
@@ -70,24 +71,12 @@ fun isConnected(context: Context, type: Int): Boolean {
         }
         for (network in networks) {
             val networkInfo = manager.getNetworkInfo(network)
-            if (networkInfo.type == type) {
+            if (networkInfo?.type == type) {
                 return networkInfo.isAvailable
             }
         }
     }
     return false
-}
-
-/**
- * 判断网络是否连接
- *
- * 需添加权限 `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>`
- *
- * @return `true`: 是<br></br>`false`: 否
- */
-fun isConnected(context: Context): Boolean {
-    val info = getActiveNetworkInfo(context)
-    return info != null && info.isConnected
 }
 
 /**
@@ -101,7 +90,7 @@ fun isConnected(context: Context): Boolean {
 private fun getActiveNetworkInfo(context: Context): NetworkInfo {
     val manager =
         context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    return manager.activeNetworkInfo
+    return manager.activeNetworkInfo!!
 }
 
 /**
@@ -109,4 +98,36 @@ private fun getActiveNetworkInfo(context: Context): NetworkInfo {
  */
 enum class State {
     MOBILE, WIFI, UN_CONNECTED, PUBLISHED
+}
+
+/**
+ * 判断网络是否连接
+ */
+fun isConnected(): Boolean {
+    val connectivity =
+        CommonContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    //不需要权限的网络连接判断
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (connectivity != null) {
+            val networks: Network? = connectivity.activeNetwork
+            val networkCapabilities = connectivity.getNetworkCapabilities(networks)
+            if (networkCapabilities != null) {
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    //                Logger.e("网络-----------wifi wifi")
+                    return true
+                } else if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    //                Logger.e("网络-----------流量 手机流量")
+                    return true
+                }
+            } else {
+                //            Logger.e("网络------------没有网络 没有网络")
+                return false
+            }
+        }
+    } else {
+        //需添加权限 `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>`
+        val info = getActiveNetworkInfo(CommonContext)
+        return info != null && info.isConnected
+    }
+    return true
 }

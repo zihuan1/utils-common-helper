@@ -2,9 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 group = 'com.github.zihuan1'
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
-
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 19

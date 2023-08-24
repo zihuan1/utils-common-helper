@@ -121,7 +121,14 @@ fun String.dateTypeCover(dType: String = "-"): String {
     DATE_CN_TYPE.forEach { date = date.replace(it, "-") }
     return date
 }
-
+/**
+ * 将当前时间转换为指定格式
+ * @param require 希望得到的格式
+ * @param type 传入的字符串格式
+ */
+fun String.dateCoverType(require: String, type: String = TIME_YYYY_MM_dd): String {
+    return stampToDate(dateToStamp(this, type), require)
+}
 private val DATE_CN_TYPE by lazy { arrayOf("年", "月", "日", "时", "分", "秒") }
 
 /**

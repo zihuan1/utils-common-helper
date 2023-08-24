@@ -3,11 +3,14 @@ package com.zihuan.utils.cmhlibrary.simple
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.ViewPropertyAnimator
 import android.widget.EditText
 import androidx.viewpager.widget.ViewPager
+import com.zihuan.utils.cmhlibrary.OnSoftKeyBoardChangeListener
+import com.zihuan.utils.cmhlibrary.SoftKeyBoardListener
 
 open class SamplePageChangeListener : ViewPager.OnPageChangeListener {
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
@@ -86,17 +89,16 @@ fun EditText.afterTextChanged(action: (String) -> Unit) {
 
 fun ValueAnimator.onEnd(action: (Boolean) -> Unit): ValueAnimator {
     addListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationEnd(animation: Animator?, isReverse: Boolean) {
+        override fun onAnimationEnd(animation: Animator, isReverse: Boolean) {
             action(isReverse)
         }
     })
     return this
 }
 
-
 fun ValueAnimator.onStart(action: (Boolean) -> Unit): ValueAnimator {
     addListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationStart(animation: Animator?, isReverse: Boolean) {
+        override fun onAnimationStart(animation: Animator, isReverse: Boolean) {
             action(isReverse)
         }
     })
@@ -114,9 +116,23 @@ fun ValueAnimator.onUpdate(action: (ValueAnimator) -> Unit): ValueAnimator {
 }
 
 
-fun ViewPropertyAnimator.animUpdate(action: (ValueAnimator) -> Unit) {
+fun ViewPropertyAnimator.onUpdate(action: (ValueAnimator) -> Unit) {
     setUpdateListener {
         action(it)
     }
 }
 
+/**
+ * 监听键盘显示和隐藏
+ */
+fun Activity.softKeyBoard(action: (Boolean) -> Unit) {
+    SoftKeyBoardListener.setListener(this, object : OnSoftKeyBoardChangeListener {
+        override fun keyBoardShow(height: Int) {
+            action(true)
+        }
+
+        override fun keyBoardHide(height: Int) {
+            action(false)
+        }
+    })
+}

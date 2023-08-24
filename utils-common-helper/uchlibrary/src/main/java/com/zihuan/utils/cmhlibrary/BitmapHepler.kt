@@ -8,18 +8,17 @@ import android.media.MediaScannerConnection
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.logging.Logger
 import kotlin.math.max
 import kotlin.math.min
 
 
+private val defPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
 /**
  * 保存图片到SD卡
  *
@@ -28,45 +27,7 @@ import kotlin.math.min
  * @param fScale      压缩比率 1为原图
  *
  */
-fun Bitmap.save(path: String, fileName: String, quality: Int = 100, fScale: Float = 1f): String {
-    val pFileDir = File(path)
-    var url = ""
-    val pFilePath = File(pFileDir, fileName)
-    if (!pFileDir.exists()) {
-        pFileDir.mkdirs()//如果路径不存在就先创建路径
-    }
-    try {
-        val out = FileOutputStream(pFilePath)
-        val stream = BufferedOutputStream(out)
-        var newBitmap = if (fScale == 1f) {
-            Bitmap.createBitmap(this)
-        } else {
-            compressImage(this, fScale)
-        }
-        newBitmap.compress(Bitmap.CompressFormat.PNG, quality, stream)
-        url = pFilePath.absolutePath
-        stream.flush()//输出
-        stream.close()//关闭
-        out.close()
-        newBitmap.recycle()
-        newBitmap = null
-        CommonLogger("保存成功" + pFilePath.absolutePath)
-        //            检测图片是否被旋转
-        val arg = readPictureDegree(url)
-        if (arg == 0) {
-            return url
-        } else {
-            //                修复旋转重新保存
-            rotatingImageView(arg, this).save(path, fileName, quality, fScale)
-        }
-    } catch (e: Exception) {
-        CommonLogger("保存失败$e")
-        //            e.printStackTrace();
-    }
-    return url
-}
-
-fun Bitmap.save(fileName: String, quality: Int = 100, fScale: Float = 1f): Boolean {
+fun Bitmap.save(path: String = defPath, fileName: String, quality: Int = 100, fScale: Float = 1f): Boolean {
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val resolver = CommonContext.contentResolver
@@ -84,26 +45,25 @@ fun Bitmap.save(fileName: String, quality: Int = 100, fScale: Float = 1f): Boole
                     compressImage(this, fScale)
                 }
                 newBitmap.compress(Bitmap.CompressFormat.PNG, quality, stream)
-                stream.flush()//输出
-                stream.close()//关闭
+                stream.flush() //输出
+                stream.close() //关闭
                 it!!.close()
                 newBitmap.recycle()
             }
         } else {
-            val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
             var url = ""
             val pFileDir = File(path)
             val pFilePath = File(pFileDir, fileName)
             if (!pFileDir.exists()) {
-                pFileDir.mkdirs()//如果路径不存在就先创建路径
+                pFileDir.mkdirs() //如果路径不存在就先创建路径
             }
             val it = FileOutputStream(pFilePath)
             val stream = BufferedOutputStream(it)
             val newBitmap = if (fScale == 1f) Bitmap.createBitmap(this) else compressImage(this, fScale)
             newBitmap.compress(Bitmap.CompressFormat.PNG, quality, stream)
             url = pFilePath.absolutePath
-            stream.flush()//输出
-            stream.close()//关闭
+            stream.flush() //输出
+            stream.close() //关闭
             it.close()
             newBitmap.recycle()
             //            检测图片是否被旋转
@@ -116,7 +76,6 @@ fun Bitmap.save(fileName: String, quality: Int = 100, fScale: Float = 1f): Boole
             MediaScannerConnection.scanFile(CommonContext, arrayOf(url), arrayOf("image/jpeg")) { path, uri ->
                 CommonLogger("刷新完成 $path uri $uri")
             }
-            //            refreshGallery(path)
         }
     } catch (e: Exception) {
         CommonLogger("图片保存失败$e")
@@ -161,10 +120,7 @@ fun drawableToBitmap(vectorDrawableId: Int): Bitmap {
     var bitmap: Bitmap? = null
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
         val vectorDrawable: Drawable = CommonContext.getDrawable(vectorDrawableId)!!
-        bitmap = Bitmap.createBitmap(
-            vectorDrawable.intrinsicWidth,
-            vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888
-        )
+        bitmap = Bitmap.createBitmap(vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
         vectorDrawable.draw(canvas)
@@ -184,10 +140,7 @@ fun readPictureDegree(path: String): Int {
     var degree = 0
     try {
         val exifInterface = ExifInterface(path)
-        when (exifInterface.getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_NORMAL
-        )) {
+        when (exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
             ExifInterface.ORIENTATION_ROTATE_90 -> degree = 90
             ExifInterface.ORIENTATION_ROTATE_180 -> degree = 180
             ExifInterface.ORIENTATION_ROTATE_270 -> degree = 270
@@ -262,37 +215,22 @@ fun Bitmap.modifySize(width: Int, height: Int): Bitmap? {
 /**
  * Transform source Bitmap to targeted width and height.
  */
-private fun transform(
-    scaler: Matrix?, source: Bitmap, targetWidth: Int, targetHeight: Int, options: Int
-): Bitmap {
+private fun transform(scaler: Matrix?, source: Bitmap, targetWidth: Int, targetHeight: Int, options: Int): Bitmap {
     var scaler = scaler
     val scaleUp = options and 1 != 0
     val recycle = options and 1 != 0
     val deltaX = source.width - targetWidth
     val deltaY = source.height - targetHeight
     if (!scaleUp && (deltaX < 0 || deltaY < 0)) {
-        val b2 = Bitmap.createBitmap(
-            targetWidth, targetHeight,
-            Bitmap.Config.ARGB_8888
-        )
+        val b2 = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888)
         val c = Canvas(b2)
 
         val deltaXHalf = max(0, deltaX / 2)
         val deltaYHalf = max(0, deltaY / 2)
-        val src = Rect(
-            deltaXHalf,
-            deltaYHalf,
-            deltaXHalf + min(targetWidth, source.width),
-            deltaYHalf + min(targetHeight, source.height)
-        )
+        val src = Rect(deltaXHalf, deltaYHalf, deltaXHalf + min(targetWidth, source.width), deltaYHalf + min(targetHeight, source.height))
         val dstX = (targetWidth - src.width()) / 2
         val dstY = (targetHeight - src.height()) / 2
-        val dst = Rect(
-            dstX,
-            dstY,
-            targetWidth - dstX,
-            targetHeight - dstY
-        )
+        val dst = Rect(dstX, dstY, targetWidth - dstX, targetHeight - dstY)
         c.drawBitmap(source, src, dst, null)
         if (recycle) {
             source.recycle()
@@ -323,10 +261,7 @@ private fun transform(
     }
 
     val b1: Bitmap
-    b1 = if (scaler != null) Bitmap.createBitmap(
-        source, 0, 0,
-        source.width, source.height, scaler, true
-    ) else {
+    b1 = if (scaler != null) Bitmap.createBitmap(source, 0, 0, source.width, source.height, scaler, true) else {
         source
     }
 
@@ -392,24 +327,18 @@ fun blur(`in`: IntArray, out: IntArray, width: Int, height: Int, radius: Float) 
         var tg = 0
         var tb = 0
         for (i in -r..r) {
-            val rgb = `in`[inIndex + clamp(
-                i, 0,
-                width - 1
-            )]
+            val rgb = `in`[inIndex + clamp(i, 0, width - 1)]
             ta += rgb shr 24 and 0xff
             tr += rgb shr 16 and 0xff
             tg += rgb shr 8 and 0xff
             tb += rgb and 0xff
         }
         for (x in 0 until width) {
-            out[outIndex] = (divide[ta] shl 24 or (divide[tr] shl 16)
-                    or (divide[tg] shl 8) or divide[tb])
+            out[outIndex] = (divide[ta] shl 24 or (divide[tr] shl 16) or (divide[tg] shl 8) or divide[tb])
             var i1 = x + r + 1
-            if (i1 > widthMinus1)
-                i1 = widthMinus1
+            if (i1 > widthMinus1) i1 = widthMinus1
             var i2 = x - r
-            if (i2 < 0)
-                i2 = 0
+            if (i2 < 0) i2 = 0
             val rgb1 = `in`[inIndex + i1]
             val rgb2 = `in`[inIndex + i2]
             ta += (rgb1 shr 24 and 0xff) - (rgb2 shr 24 and 0xff)
@@ -428,23 +357,35 @@ fun clamp(x: Int, a: Int, b: Int): Int {
 }
 
 /**
+ * 截图
+ * @param height 指定高度
+ */
+fun View.toBitmap(setHeight: Int = 0): Bitmap {
+    val screenshot = Bitmap.createBitmap(width, if (setHeight == 0) height else setHeight, Bitmap.Config.ARGB_8888)
+    val c = Canvas(screenshot)
+    draw(c)
+    return screenshot
+}
+
+/**
  * View转Bitmap
  */
-fun View.toBitmap(): Bitmap {
-    // 创建对应大小的bitmap
-    var viewHeight = 0
-    if (this is ViewGroup) {
-        for (i in 0 until childCount) {
-            viewHeight += getChildAt(i).height
-        }
-    } else {
-        height
-    }
-    var bitmap = Bitmap.createBitmap(width, viewHeight, Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(bitmap)
-    draw(canvas)
-    return bitmap
-}
+//fun View.toBitmap(): Bitmap {
+//    // 创建对应大小的bitmap
+//    var viewHeight = 0
+//    if (this is ViewGroup) {
+//        for (i in 0 until childCount) {
+//            viewHeight += getChildAt(i).height
+//        }
+//    } else {
+//        height
+//    }
+//    var bitmap = Bitmap.createBitmap(width, viewHeight, Bitmap.Config.ARGB_8888)
+//    val canvas = Canvas(bitmap)
+//    draw(canvas)
+//    return bitmap
+//}
+
 
 fun View.toBitmap2(): Bitmap {
     val screenshot: Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)

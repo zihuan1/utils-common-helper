@@ -77,8 +77,7 @@ fun getFilesPath(@NotNull path: String, @NotNull files: ArrayList<File>): List<F
  *      FileUtils.stringMerge(list)
  * **/
 fun stringMerge(path: String): String {
-    var outPath =
-        Environment.getExternalStorageDirectory().toString() + "/amergecode"
+    var outPath = Environment.getExternalStorageDirectory().toString() + "/amergecode"
     val file = File(outPath)
     if (!file.exists()) {
         file.mkdir()
@@ -97,16 +96,29 @@ fun stringMerge(path: String): String {
         it.channel.use { fileChannel ->
             getFilesPath(path, ArrayList()).forEach { it ->
                 FileInputStream(it.absoluteFile).channel.use { it ->
-                    it.transferTo(
-                        0,
-                        it.size(),
-                        fileChannel
-                    )
+                    it.transferTo(0, it.size(), fileChannel)
                 }
             }
         }
     }
     return file2.absolutePath
+}
+
+/** 将多个文件夹的内容合并到一个新文件
+ * 一般用于申请软著之类的需要3000行代码
+ */
+fun stringMerge(files: List<File>) {
+    var outPath = Environment.getExternalStorageDirectory().toString() + "/AMergeCode/mergeCode.txt"
+    var outOs = FileOutputStream(File(outPath))
+    outOs.use { stream ->
+        stream.channel.use { fileChannel ->
+            files.forEach { file ->
+                FileInputStream(file.absoluteFile).channel.use {
+                    it.transferTo(0, it.size(), fileChannel)
+                }
+            }
+        }
+    }
 }
 
 val FILENAME = "tripsTemp"
@@ -117,8 +129,7 @@ val FILENAME = "tripsTemp"
  * @return 文件夹路径
  */
 fun createNewFile(fileName: String = FILENAME): String {
-    val file =
-        File(Environment.getExternalStorageDirectory().toString() + File.separator + fileName)
+    val file = File(Environment.getExternalStorageDirectory().toString() + File.separator + fileName)
     if (!file.exists()) {
         file.mkdirs()
     }
@@ -144,10 +155,7 @@ fun getImgPath(name: String): String {
  */
 fun getUriFromDrawableRes(context: Context, id: Int): Uri {
     val resources = context.resources
-    val path = (ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
-            + resources.getResourcePackageName(id) + "/"
-            + resources.getResourceTypeName(id) + "/"
-            + resources.getResourceEntryName(id))
+    val path = (ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + resources.getResourcePackageName(id) + "/" + resources.getResourceTypeName(id) + "/" + resources.getResourceEntryName(id))
     return Uri.parse(path)
 }
 
@@ -157,24 +165,21 @@ fun getSpecificTypeOfFile(context: Context, extension: Array<String>): ArrayList
     //从外存中获取
     val fileUri = MediaStore.Files.getContentUri("external")
     //筛选列，这里只筛选了：文件路径和不含后缀的文件名
-    val projection =
-        arrayOf(MediaStore.Files.FileColumns.DATA, MediaStore.Files.FileColumns.TITLE)
+    val projection = arrayOf(MediaStore.Files.FileColumns.DATA, MediaStore.Files.FileColumns.TITLE)
     //构造筛选语句
     var selection = ""
     for (i in extension.indices) {
         if (i != 0) {
             selection = "$selection OR "
         }
-        selection =
-            selection + MediaStore.Files.FileColumns.DATA + " LIKE '%" + extension[i] + "'"
+        selection = selection + MediaStore.Files.FileColumns.DATA + " LIKE '%" + extension[i] + "'"
     }
     //按时间递增顺序对结果进行排序;待会从后往前移动游标就可实现时间递减
     val sortOrder = MediaStore.Files.FileColumns.DATE_MODIFIED
     //获取内容解析器对象
     val resolver = context.contentResolver
     //获取游标
-    val cursor = resolver.query(fileUri, projection, selection, null, sortOrder)
-        ?: return uriList
+    val cursor = resolver.query(fileUri, projection, selection, null, sortOrder) ?: return uriList
     //游标从最后开始往前递减，以此实现时间递减顺序（最近访问的文件，优先显示）
     if (cursor.moveToLast()) {
         do {
@@ -203,10 +208,8 @@ fun File.deleteFile(): Boolean {
         CommonLogger("删除文件失败:" + absolutePath + "不存在！")
         false
     } else {
-        if (isFile)
-            deleteSingleFile(absolutePath)
-        else
-            deleteDirectory(absolutePath)
+        if (isFile) deleteSingleFile(absolutePath)
+        else deleteDirectory(absolutePath)
     }
 }
 
@@ -242,8 +245,7 @@ fun deleteSingleFile(filePathName: String): Boolean {
 fun deleteDirectory(filePath: String): Boolean {
     var filePath = filePath
     // 如果dir不以文件分隔符结尾，自动添加文件分隔符
-    if (!filePath.endsWith(File.separator))
-        filePath += File.separator
+    if (!filePath.endsWith(File.separator)) filePath += File.separator
     val dirFile = File(filePath)
     // 如果dir对应的文件不存在，或者不是一个目录，则退出
     if (!dirFile.exists() || !dirFile.isDirectory) {
@@ -257,16 +259,11 @@ fun deleteDirectory(filePath: String): Boolean {
         // 删除子文件
         if (file.isFile) {
             flag = deleteSingleFile(file.absolutePath)
-            if (!flag)
-                break
+            if (!flag) break
         } else if (file.isDirectory) {
-            flag = deleteDirectory(
-                file
-                    .absolutePath
-            )
-            if (!flag)
-                break
-        }// 删除子目录
+            flag = deleteDirectory(file.absolutePath)
+            if (!flag) break
+        } // 删除子目录
     }
     if (!flag) {
         CommonLogger("删除目录失败！")
@@ -302,9 +299,7 @@ fun Context.getRealFilePath(uri: Uri): String? {
         } else if (isDownloadsDocument(uri)) {
 
             val id = DocumentsContract.getDocumentId(uri)
-            val contentUri = ContentUris.withAppendedId(
-                Uri.parse("content://downloads/public_downloads"), java.lang.Long.valueOf(id)
-            )
+            val contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), java.lang.Long.valueOf(id))
 
             return getDataColumn(this, contentUri, null, null)
         } else if (isMediaDocument(uri)) {
@@ -325,13 +320,13 @@ fun Context.getRealFilePath(uri: Uri): String? {
             val selectionArgs = arrayOf(split[1])
 
             return getDataColumn(this, contentUri, selection, selectionArgs)
-        }// MediaProvider
+        } // MediaProvider
         // DownloadsProvider
     } else if ("content".equals(uri.scheme!!, ignoreCase = true)) {
         return getDataColumn(this, uri, null, null)
     } else if ("file".equals(uri.scheme!!, ignoreCase = true)) {
         return uri.path
-    }// File
+    } // File
     // MediaStore (and general)
     return null
 }
@@ -505,12 +500,9 @@ private fun formatFileSize(fileS: Long, sizeType: Int): Double {
     var fileSizeLong = 0.0
     when (sizeType) {
         SIZETYPE_B -> fileSizeLong = java.lang.Double.valueOf(df.format(fileS.toDouble()))
-        SIZETYPE_KB -> fileSizeLong =
-            java.lang.Double.valueOf(df.format(fileS.toDouble() / 1024))
-        SIZETYPE_MB -> fileSizeLong =
-            java.lang.Double.valueOf(df.format(fileS.toDouble() / 1048576))
-        SIZETYPE_GB -> fileSizeLong =
-            java.lang.Double.valueOf(df.format(fileS.toDouble() / 1073741824))
+        SIZETYPE_KB -> fileSizeLong = java.lang.Double.valueOf(df.format(fileS.toDouble() / 1024))
+        SIZETYPE_MB -> fileSizeLong = java.lang.Double.valueOf(df.format(fileS.toDouble() / 1048576))
+        SIZETYPE_GB -> fileSizeLong = java.lang.Double.valueOf(df.format(fileS.toDouble() / 1073741824))
         else -> {
         }
     }
@@ -582,7 +574,7 @@ fun Context.getStoragePath(is_removale: Boolean = true): String? {
             val removable = isRemovable.invoke(storageVolumeElement) as Boolean
             //返回外部存储路径
             if (is_removale != removable) {
-//                return if (checkMounted(path)) path else null
+                //                return if (checkMounted(path)) path else null
                 continue
             }
         }
@@ -601,9 +593,7 @@ fun Context.checkMounted(mountPoint: String?): Boolean {
     }
     val storageManager = getSystemService(Context.STORAGE_SERVICE) as StorageManager
     try {
-        val getVolumeState = storageManager.javaClass.getMethod(
-            "getVolumeState", String::class.java
-        )
+        val getVolumeState = storageManager.javaClass.getMethod("getVolumeState", String::class.java)
         val state = getVolumeState.invoke(storageManager, mountPoint) as String
         return Environment.MEDIA_MOUNTED == state
     } catch (e: Exception) {
@@ -627,6 +617,7 @@ fun renameFile(path: String, newName: String) {
         renameFile2(oldPath, newPath)
     }
 }
+
 /**
  * 重命名文件并且覆盖后缀名
  * @param path 文件路径
@@ -657,24 +648,13 @@ private fun renameFile2(oldPath: String, newPath: String) {
     file.renameTo(File(newPath))
 }
 
-/** 将多个文件夹的内容合并到一个新文件
- * 一般用于申请软著之类的需要3000行代码
- */
-fun stringMerge(files: List<File>) {
-    var outPath =
-        Environment.getExternalStorageDirectory().toString() + "/amergecode/mergecode1.txt"
-    var outOs = FileOutputStream(File(outPath))
-    outOs.use { stream ->
-        stream.channel.use { fileChannel ->
-            files.forEach { file ->
-                FileInputStream(file.absoluteFile).channel.use {
-                    it.transferTo(
-                        0,
-                        it.size(),
-                        fileChannel
-                    )
-                }
-            }
-        }
+/** 通过 ‘？’ 和 ‘/’ 判断文件名  */
+fun getUrlFileName(url: String): String? {
+    val index = url.lastIndexOf('?')
+    val filename = if (index > 1) {
+        url.substring(url.lastIndexOf('/') + 1, index)
+    } else {
+        url.substring(url.lastIndexOf('/') + 1)
     }
+    return filename
 }
