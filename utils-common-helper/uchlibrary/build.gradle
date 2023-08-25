@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 group = 'com.github.zihuan1'
 android {
     compileSdkVersion 33
+    buildToolsVersion "29.0.2"
 
     defaultConfig {
         minSdkVersion 19
@@ -17,7 +18,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
+//    compileOptions {
+//        sourceCompatibility JavaVersion.VERSION_1_8
+//        targetCompatibility JavaVersion.VERSION_1_8
+//    }
 }
 // 打包源码jar
 task sourcesJar(type: Jar) {
